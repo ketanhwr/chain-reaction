@@ -1,5 +1,8 @@
 var width = 420;
 var height = 630;
+var gapWidth = width/6;
+var gapHeight = height/9;
+var turnCount = 0;
 
 var canvas = document.getElementById("arena");
 var gameArena = canvas.getContext("2d");
@@ -27,7 +30,7 @@ function initialiseMatrix()
 	{
 		for(var j = 0; j < 6; j++)
 		{
-			colorMatrix[i][j] = 'Z';	//No color
+			colorMatrix[i][j] = "";		//No color
 			countMatrix[i][j] = 0;		//No value
 		}
 	}
@@ -35,7 +38,9 @@ function initialiseMatrix()
 
 function drawArena()
 {
-	var gapWidth = width/6;
+	gameArena.clearRect(0, 0, width, height);
+	gameArena.font = "35px Times New Roman";
+
 	for(var counter = 1; counter < 6; counter++)
 	{
 		gameArena.beginPath();
@@ -44,7 +49,7 @@ function drawArena()
 		gameArena.closePath();
 		gameArena.stroke();
 	}
-	var gapHeight = height/9;
+
 	for(var counter = 1; counter < 9; counter++)
 	{
 		gameArena.beginPath();
@@ -53,6 +58,17 @@ function drawArena()
 		gameArena.closePath();
 		gameArena.stroke();
 	}
+
+	for(var i = 0; i < 9; i++)
+	{
+		for(var j = 0; j < 6; j++)
+		{
+			if(countMatrix[i][j] == 0)
+				continue;
+			gameArena.fillStyle = colorMatrix[i][j];
+			gameArena.fillText(countMatrix[i][j], j*gapWidth + 25, i*gapHeight + 45);
+		}
+	}
 }
 
 function test(event)
@@ -60,5 +76,21 @@ function test(event)
 	var rect = canvas.getBoundingClientRect();
 	var x = event.clientX - rect.left;
 	var y = event.clientY - rect.top;
-	alert("X: " + x + " Y: " + y);
+	
+	var row = Math.floor(x/gapWidth);
+	var column = Math.floor(y/gapHeight);
+	
+	if(turnCount%2 == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
+	{
+		countMatrix[column][row]++;		//Weird graphic coordinate-system
+		colorMatrix[column][row] = "red";
+		turnCount++;
+	}
+	if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
+	{
+		countMatrix[column][row]++;		//Weird graphic coordinate-system
+		colorMatrix[column][row] = "green";
+		turnCount++;
+	}
+	drawArena();
 }
