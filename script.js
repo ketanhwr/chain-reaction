@@ -53,7 +53,6 @@ function matrixDefault()
 function drawArena()
 {
 	gameArena.clearRect(0, 0, width, height);
-	gameArena.font = "35px Times New Roman";
 
 	for(var counter = 1; counter < 6; counter++)
 	{
@@ -131,103 +130,111 @@ function updateMatrix()
 	drawArena();
 	while(notStable())
 	{
-		if(countMatrix[0][0] == 2)
+		if(countMatrix[0][0] >= 2)
 		{
-			countMatrix[0][0] = 0;
+			countMatrix[0][0] -= 2;
 			countMatrix[1][0]++;
 			countMatrix[0][1]++;
 			colorMatrix[1][0] = colorMatrix[0][0];
 			colorMatrix[0][1] = colorMatrix[0][0];
-			colorMatrix[0][0] = "";
+			if(countMatrix[0][0] == 0)
+				colorMatrix[0][0] = "";
 			break;
 		}
-		if(countMatrix[8][0] == 2)
+		if(countMatrix[8][0] >= 2)
 		{
-			countMatrix[8][0] = 0;
+			countMatrix[8][0] -= 2;
 			countMatrix[7][0]++;
 			countMatrix[8][1]++;
 			colorMatrix[7][0] = colorMatrix[8][0];
 			colorMatrix[8][1] = colorMatrix[8][0];
-			colorMatrix[8][0] = "";
+			if(countMatrix[8][0] == 0)
+				colorMatrix[8][0] = "";
 			break;
 		}
-		if(countMatrix[8][5] == 2)
+		if(countMatrix[8][5] >= 2)
 		{
-			countMatrix[8][5] = 0;
+			countMatrix[8][5] -= 2;
 			countMatrix[7][5]++;
 			countMatrix[8][4]++;
 			colorMatrix[7][5] = colorMatrix[8][5];
 			colorMatrix[8][4] = colorMatrix[8][5];
-			colorMatrix[8][5] = "";
+			if(countMatrix[8][5] == 0)
+				colorMatrix[8][5] = "";
 			break;
 		}
-		if(countMatrix[0][5] == 2)
+		if(countMatrix[0][5] >= 2)
 		{
-			countMatrix[0][5] = 0;
+			countMatrix[0][5] -= 2;
 			countMatrix[1][5]++;
 			countMatrix[0][4]++;
 			colorMatrix[1][5] = colorMatrix[0][5];
 			colorMatrix[0][4] = colorMatrix[0][5];
-			colorMatrix[0][5] = "";
+			if(countMatrix[0][5] == 0)
+				colorMatrix[0][5] = "";
 			break;
 		}
 		for(var i = 1; i < 8; i++)
 		{
-			if(countMatrix[i][0] == 3)
+			if(countMatrix[i][0] >= 3)
 			{
-				countMatrix[i][0] = 0;
+				countMatrix[i][0] -= 3;
 				countMatrix[i-1][0]++;
 				countMatrix[i+1][0]++;
 				countMatrix[i][1]++;
 				colorMatrix[i][1] = colorMatrix[i][0];
 				colorMatrix[i-1][0] = colorMatrix[i][0];
 				colorMatrix[i+1][0] = colorMatrix[i][0];
-				colorMatrix[i][0] = "";
+				if(countMatrix[i][0] == 0)
+					colorMatrix[i][0] = "";
 				break;
 			}
 		}
 		for(var i = 1; i < 8; i++)
 		{
-			if(countMatrix[i][5] == 3)
+			if(countMatrix[i][5] >= 3)
 			{
-				countMatrix[i][5] = 0;
+				countMatrix[i][5] -= 3;
 				countMatrix[i-1][5]++;
 				countMatrix[i+1][5]++;
 				countMatrix[i][4]++;
 				colorMatrix[i][4] = colorMatrix[i][5];
 				colorMatrix[i-1][5] = colorMatrix[i][5];
 				colorMatrix[i+1][5] = colorMatrix[i][5];
-				colorMatrix[i][5] = "";
+				if(countMatrix[i][5] == 0)
+					colorMatrix[i][5] = "";
 				break;
 			}
 		}
 		for(var i = 1; i < 5; i++)
 		{
-			if(countMatrix[0][i] == 3)
+			if(countMatrix[0][i] >= 3)
 			{
-				countMatrix[0][i] = 0;
+				countMatrix[0][i] -= 3;
 				countMatrix[1][i]++;
 				countMatrix[0][i-1]++;
 				countMatrix[0][i+1]++;
 				colorMatrix[1][i] = colorMatrix[0][i];
 				colorMatrix[0][i-1] = colorMatrix[0][i];
 				colorMatrix[0][i+1] = colorMatrix[0][i];
-				colorMatrix[0][i] = "";
+				if(countMatrix[0][i] == 0)
+					colorMatrix[0][i] = "";
 				break;
 			}
 		}
 		for(var i = 1; i < 5; i++)
 		{
-			if(countMatrix[8][i] == 3)
+			if(countMatrix[8][i] >= 3)
 			{
-				countMatrix[8][i] = 0;
+				countMatrix[8][i] -= 3;
 				countMatrix[7][i]++;
 				countMatrix[8][i-1]++;
 				countMatrix[8][i+1]++;
 				colorMatrix[7][i] = colorMatrix[8][i];
 				colorMatrix[8][i-1] = colorMatrix[8][i];
 				colorMatrix[8][i+1] = colorMatrix[8][i];
-				colorMatrix[8][i] = "";
+				if(countMatrix[8][i] == 0)
+					colorMatrix[8][i] = "";
 				break;
 			}
 		}
@@ -235,9 +242,9 @@ function updateMatrix()
 		{
 			for(var j = 1; j < 5; j++)
 			{
-				if(countMatrix[i][j] == 4)
+				if(countMatrix[i][j] >= 4)
 				{
-					countMatrix[i][j] = 0;
+					countMatrix[i][j] -= 4;
 					countMatrix[i-1][j]++;
 					countMatrix[i+1][j]++;
 					countMatrix[i][j-1]++;
@@ -246,7 +253,8 @@ function updateMatrix()
 					colorMatrix[i+1][j] = colorMatrix[i][j];
 					colorMatrix[i][j-1] = colorMatrix[i][j];
 					colorMatrix[i][j+1] = colorMatrix[i][j];
-					colorMatrix[i][j] = "";
+					if(countMatrix[i][j] == 0)
+						colorMatrix[i][j] = "";
 					break;
 				}
 			}
@@ -259,20 +267,20 @@ function updateMatrix()
 function notStable()
 {
 	var ans = false;
-	if(countMatrix[0][0] == 2 || countMatrix[8][0] == 2 || countMatrix[8][5] == 2 || countMatrix[0][5] == 2)
+	if(countMatrix[0][0] >= 2 || countMatrix[8][0] >= 2 || countMatrix[8][5] >= 2 || countMatrix[0][5] >= 2)
 		ans = true;
 
 	for(var i = 1; i < 8; i++)
-		if(countMatrix[i][0] == 3 || countMatrix[i][5] == 3)
+		if(countMatrix[i][0] >= 3 || countMatrix[i][5] >= 3)
 			ans = true;
 
 	for(var i = 1; i < 5; i++)
-		if(countMatrix[0][i] == 3 || countMatrix[8][i] == 3)
+		if(countMatrix[0][i] >= 3 || countMatrix[8][i] >= 3)
 			ans = true;
 
 	for(var i = 1; i < 8; i++)
 		for(var j = 1; j < 8; j++)
-			if(countMatrix[i][j] == 4)
+			if(countMatrix[i][j] >= 4)
 				ans = true;
 
 	return ans;
