@@ -8,6 +8,7 @@ var gameTimer;
 var countMatrix = new Array(9);
 var colorMatrix = new Array(9);
 var isGameOver = false;
+var counterAnimate = 0;
 
 var canvas = document.getElementById("arena");
 var gameArena = canvas.getContext("2d");
@@ -22,6 +23,7 @@ function initialise()
 	matrixDefault();
 	drawArena();
 	turnCount = 0;
+	counterAnimate = 0;
 	gameTimer = setInterval(updateMatrix, gameSpeed);
 }
 
@@ -53,6 +55,7 @@ function matrixDefault()
 function drawArena()
 {
 	gameArena.clearRect(0, 0, width, height);
+	gameArena.strokeStyle = "black";
 
 	for(var counter = 1; counter < 6; counter++)
 	{
@@ -127,6 +130,7 @@ function checkGameOver()
 
 function updateMatrix()
 {
+	counterAnimate++;
 	drawArena();
 	while(notStable())
 	{
@@ -339,8 +343,21 @@ function oneCircle(row, column, color)
 	gameArena.arc(column*gapWidth + 35, row*gapHeight + 35, 15, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
+	if((row == 0 && column == 0) || (row == 8 && column == 0) || (row == 0 && column == 5) || (row == 8 && column == 5))
+	{
+		if(counterAnimate%2 == 0)
+			gameArena.strokeStyle = "black";
+		else
+			gameArena.strokeStyle = color;
+	}
+	else
+	{
+		gameArena.strokeStyle = "black";
+	}
+	gameArena.lineWidth = 3;
 	gameArena.stroke();
 	gameArena.closePath();
+	gameArena.lineWidth = 1;
 }
 
 function twoCircle(row, column, color)
@@ -349,15 +366,41 @@ function twoCircle(row, column, color)
 	gameArena.arc(column*gapWidth + 20, row*gapHeight + 35, 15, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
+	if(((row >= 1 && row < 8) && (column == 0 || column == 5)) || ((row == 0 || row == 8) && (column >= 1 && column < 5)))
+	{
+		if(counterAnimate%2 == 0)
+			gameArena.strokeStyle = "black";
+		else
+			gameArena.strokeStyle = color;
+	}
+	else
+	{
+		gameArena.strokeStyle = "black";
+	}
+	gameArena.lineWidth = 3;
 	gameArena.stroke();
 	gameArena.closePath();
+	gameArena.lineWidth = 1;
 
 	gameArena.beginPath();
 	gameArena.arc(column*gapWidth + 50, row*gapHeight + 35, 15, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
+	if(((row >= 1 && row < 8) && (column == 0 || column == 5)) || ((row == 0 || row == 8) && (column >= 1 && column < 5)))
+	{
+		if(counterAnimate%2 == 0)
+			gameArena.strokeStyle = "black";
+		else
+			gameArena.strokeStyle = color;
+	}
+	else
+	{
+		gameArena.strokeStyle = "black";
+	}
+	gameArena.lineWidth = 3;
 	gameArena.stroke();
 	gameArena.closePath();
+	gameArena.lineWidth = 1;
 }
 
 function threeCircle(row, column, color)
@@ -366,20 +409,38 @@ function threeCircle(row, column, color)
 	gameArena.arc(column*gapWidth + 20, row*gapHeight + 17, 15, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
+	if(counterAnimate%2 == 0)
+		gameArena.strokeStyle = "black";
+	else
+		gameArena.strokeStyle = color;
+	gameArena.lineWidth = 3;
 	gameArena.stroke();
 	gameArena.closePath();
+	gameArena.lineWidth = 1;
 
 	gameArena.beginPath();
 	gameArena.arc(column*gapWidth + 20, row*gapHeight + 53, 15, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
+	if(counterAnimate%2 == 0)
+		gameArena.strokeStyle = "black";
+	else
+		gameArena.strokeStyle = color;
+	gameArena.lineWidth = 3;
 	gameArena.stroke();
 	gameArena.closePath();
+	gameArena.lineWidth = 1;
 
 	gameArena.beginPath();
 	gameArena.arc(column*gapWidth + 50, row*gapHeight + 35, 15, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
+	if(counterAnimate%2 == 0)
+		gameArena.strokeStyle = "black";
+	else
+		gameArena.strokeStyle = color;
+	gameArena.lineWidth = 3;
 	gameArena.stroke();
 	gameArena.closePath();
+	gameArena.lineWidth = 1;
 }
