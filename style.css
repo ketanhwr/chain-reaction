@@ -7,3 +7,27 @@ canvas
 {
 	background-color: white;
 }
+
+.undo
+{
+	background-color: white;
+	color: black;
+	font-size: 18px;
+	width: 130px;
+	border-radius: 25px;
+	text-decoration: none;
+	height: 20px;
+	margin-bottom: 10px;
+	margin-top: -10px;
+	transition: background-color 0.8s, color 0.8s;
+	-webkit-transition: background-color 0.8s, color 0.8s;
+	-moz-transition: background-color 0.8s, color 0.8s;
+	-o-transition: background-color 0.8s, color 0.8s;
+}
+
+.undo:hover
+{
+	background-color: #3c213c;
+	color: white;
+	cursor: pointer;
+}

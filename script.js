@@ -7,13 +7,18 @@ var gameSpeed = 300;
 var gameTimer;
 var countMatrix = new Array(9);
 var colorMatrix = new Array(9);
+var undoCount = new Array(9)
+var undoColor = new Array(9);
 var isGameOver = false;
 var counterAnimate = 0;
+var flag = false;
 
 var canvas = document.getElementById("arena");
+var button = document.getElementById("undo");
 var sound = document.getElementById("sound");
 var gameArena = canvas.getContext("2d");
 canvas.addEventListener("click", gameLoop);
+button.addEventListener("click", undoGame);
 
 initialiseMatrix();
 initialise();
@@ -33,11 +38,9 @@ function initialiseMatrix()
 	for(var counter = 0; counter < 9; counter++)
 	{
 		countMatrix[counter] = new Array(6);
-	}
-
-	for(var counter = 0; counter < 9; counter++)
-	{
 		colorMatrix[counter] = new Array(6);
+		undoCount[counter] = new Array(6);
+		undoColor[counter] = new Array(6);
 	}
 }
 
@@ -49,6 +52,8 @@ function matrixDefault()
 		{
 			colorMatrix[i][j] = "";		//No color
 			countMatrix[i][j] = 0;		//No value
+			undoCount[i][j] = 0;		//No value
+			undoColor[i][j] = "";		//No color
 		}
 	}
 }
@@ -92,6 +97,36 @@ function drawArena()
 	}
 }
 
+function undoGame()
+{
+	if(turnCount > 0 && flag == false)	
+	{
+		flag = true;
+		turnCount--;
+		for(var i = 0; i < 9; i++)
+		{
+			for(var j = 0; j < 6; j++)
+			{
+				countMatrix[i][j] = undoCount[i][j];
+				colorMatrix[i][j] = undoColor[i][j];
+			}
+		}
+	}
+
+}
+
+function takeBackUp()
+{
+	for(var i = 0; i < 9; i++)
+	{
+		for(var j = 0; j < 6; j++)
+		{
+			undoCount[i][j] = countMatrix[i][j];
+			undoColor[i][j] = colorMatrix[i][j];
+		}
+	}
+}
+
 function gameLoop(event)
 {
 	var rect = canvas.getBoundingClientRect();
@@ -103,17 +138,20 @@ function gameLoop(event)
 	
 	if(!isGameOver)
 	{
+		takeBackUp();
 		if(turnCount%2 == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
 			colorMatrix[column][row] = "red";
 			turnCount++;
+			flag = false;
 		}
 		if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
 			colorMatrix[column][row] = "green";
 			turnCount++;
+			flag = false;
 		}
 	}
 }
