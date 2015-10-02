@@ -11,6 +11,7 @@ var isGameOver = false;
 var counterAnimate = 0;
 
 var canvas = document.getElementById("arena");
+var sound = document.getElementById("sound");
 var gameArena = canvas.getContext("2d");
 canvas.addEventListener("click", gameLoop);
 
@@ -143,6 +144,7 @@ function updateMatrix()
 			colorMatrix[0][1] = colorMatrix[0][0];
 			if(countMatrix[0][0] == 0)
 				colorMatrix[0][0] = "";
+			sound.play();
 			break;
 		}
 		if(countMatrix[8][0] >= 2)
@@ -154,6 +156,7 @@ function updateMatrix()
 			colorMatrix[8][1] = colorMatrix[8][0];
 			if(countMatrix[8][0] == 0)
 				colorMatrix[8][0] = "";
+			sound.play();
 			break;
 		}
 		if(countMatrix[8][5] >= 2)
@@ -165,6 +168,7 @@ function updateMatrix()
 			colorMatrix[8][4] = colorMatrix[8][5];
 			if(countMatrix[8][5] == 0)
 				colorMatrix[8][5] = "";
+			sound.play();
 			break;
 		}
 		if(countMatrix[0][5] >= 2)
@@ -176,6 +180,7 @@ function updateMatrix()
 			colorMatrix[0][4] = colorMatrix[0][5];
 			if(countMatrix[0][5] == 0)
 				colorMatrix[0][5] = "";
+			sound.play();
 			break;
 		}
 		for(var i = 1; i < 8; i++)
@@ -191,6 +196,7 @@ function updateMatrix()
 				colorMatrix[i+1][0] = colorMatrix[i][0];
 				if(countMatrix[i][0] == 0)
 					colorMatrix[i][0] = "";
+				sound.play();
 				break;
 			}
 		}
@@ -207,6 +213,7 @@ function updateMatrix()
 				colorMatrix[i+1][5] = colorMatrix[i][5];
 				if(countMatrix[i][5] == 0)
 					colorMatrix[i][5] = "";
+				sound.play();
 				break;
 			}
 		}
@@ -223,6 +230,7 @@ function updateMatrix()
 				colorMatrix[0][i+1] = colorMatrix[0][i];
 				if(countMatrix[0][i] == 0)
 					colorMatrix[0][i] = "";
+				sound.play();
 				break;
 			}
 		}
@@ -239,6 +247,7 @@ function updateMatrix()
 				colorMatrix[8][i+1] = colorMatrix[8][i];
 				if(countMatrix[8][i] == 0)
 					colorMatrix[8][i] = "";
+				sound.play();
 				break;
 			}
 		}
@@ -259,6 +268,7 @@ function updateMatrix()
 					colorMatrix[i][j+1] = colorMatrix[i][j];
 					if(countMatrix[i][j] == 0)
 						colorMatrix[i][j] = "";
+					sound.play();
 					break;
 				}
 			}
