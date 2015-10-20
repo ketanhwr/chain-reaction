@@ -156,145 +156,66 @@ function gameLoop(event)
 	}
 }
 
-function checkGameOver()
-{
-	if(gameOver() == 1 || gameOver() == 2)
-	{
-		isGameOver = true;
-		gameOverScreen(gameOver());
-		clearInterval(gameTimer);
-		setTimeout(initialise, 4000);
-	}
+function populateCornerCells(i, j){
+	countMatrix[i][j] -= 2;
+	countMatrix[ i == 8 ? i-1 : i+1 ][j]++;
+	countMatrix[i][ j==5 ? j-1 : j+1 ]++;
+	colorMatrix[ i == 8 ? i-1 : i+1 ][j] = colorMatrix[i][j];
+	colorMatrix[i][ j==5 ? j-1 : j+1 ] = colorMatrix[i][j];
+	if(countMatrix[i][j] == 0)
+		colorMatrix[i][j] = "";
+	sound.play();
+}
+
+function populateSideHCells(i, j){  // H = Height
+	countMatrix[i][j] -= 3;
+	countMatrix[i-1][j]++;
+	countMatrix[i+1][j]++;
+	countMatrix[i][ j==0 ? j+1 : j-1 ]++;
+	colorMatrix[i][ j==0 ? j+1 : j-1 ] = colorMatrix[i][j];
+	colorMatrix[i-1][j] = colorMatrix[i][j];
+	colorMatrix[i+1][j] = colorMatrix[i][j];
+	if(countMatrix[i][j] == 0)
+		colorMatrix[i][j] = "";
+	sound.play();
+}
+
+function populateSideWCells(i, j) {  // W = Width
+	countMatrix[i][j] -= 3;
+	countMatrix[ i==0 ? i+1 : i-1 ][j]++;
+	countMatrix[i][j-1]++;
+	countMatrix[i][j+1]++;
+	colorMatrix[ i==0 ? i+1 : i-1 ][j] = colorMatrix[i][j];
+	colorMatrix[i][j-1] = colorMatrix[i][j];
+	colorMatrix[i][j+1] = colorMatrix[i][j];
+	if(countMatrix[i][j] == 0)
+		colorMatrix[i][j] = "";
+	sound.play();
 }
 
 function updateMatrix()
 {
 	counterAnimate++;
 	drawArena();
-	while(notStable())
-	{
-		if(countMatrix[0][0] >= 2)
-		{
-			countMatrix[0][0] -= 2;
-			countMatrix[1][0]++;
-			countMatrix[0][1]++;
-			colorMatrix[1][0] = colorMatrix[0][0];
-			colorMatrix[0][1] = colorMatrix[0][0];
-			if(countMatrix[0][0] == 0)
-				colorMatrix[0][0] = "";
-			sound.play();
-			break;
+	var cornerCord = [[0,0], [8,0], [8,5], [0,5]];
+
+	while(notStable()){
+		for(var i = 0; i < 4;i++)
+			if(countMatrix[cornerCord[i][0]][cornerCord[i][1]] >= 2){ populateCornerCells(cornerCord[i][0], cornerCord[i][1]); break; }
+
+		for(var i = 1; i < 8; i++){
+			if(countMatrix[i][0] >= 3){ populateSideHCells(i, 0); break; }
+			if(countMatrix[i][5] >= 3){ populateSideHCells(i, 5); break; }
 		}
-		if(countMatrix[8][0] >= 2)
-		{
-			countMatrix[8][0] -= 2;
-			countMatrix[7][0]++;
-			countMatrix[8][1]++;
-			colorMatrix[7][0] = colorMatrix[8][0];
-			colorMatrix[8][1] = colorMatrix[8][0];
-			if(countMatrix[8][0] == 0)
-				colorMatrix[8][0] = "";
-			sound.play();
-			break;
+
+		for(var i = 1; i < 5; i++){
+			if(countMatrix[0][i] >= 3){ populateSideWCells(0, i); break; }
+			if(countMatrix[8][i] >= 3){ populateSideWCells(8, i); break; }
 		}
-		if(countMatrix[8][5] >= 2)
-		{
-			countMatrix[8][5] -= 2;
-			countMatrix[7][5]++;
-			countMatrix[8][4]++;
-			colorMatrix[7][5] = colorMatrix[8][5];
-			colorMatrix[8][4] = colorMatrix[8][5];
-			if(countMatrix[8][5] == 0)
-				colorMatrix[8][5] = "";
-			sound.play();
-			break;
-		}
-		if(countMatrix[0][5] >= 2)
-		{
-			countMatrix[0][5] -= 2;
-			countMatrix[1][5]++;
-			countMatrix[0][4]++;
-			colorMatrix[1][5] = colorMatrix[0][5];
-			colorMatrix[0][4] = colorMatrix[0][5];
-			if(countMatrix[0][5] == 0)
-				colorMatrix[0][5] = "";
-			sound.play();
-			break;
-		}
-		for(var i = 1; i < 8; i++)
-		{
-			if(countMatrix[i][0] >= 3)
-			{
-				countMatrix[i][0] -= 3;
-				countMatrix[i-1][0]++;
-				countMatrix[i+1][0]++;
-				countMatrix[i][1]++;
-				colorMatrix[i][1] = colorMatrix[i][0];
-				colorMatrix[i-1][0] = colorMatrix[i][0];
-				colorMatrix[i+1][0] = colorMatrix[i][0];
-				if(countMatrix[i][0] == 0)
-					colorMatrix[i][0] = "";
-				sound.play();
-				break;
-			}
-		}
-		for(var i = 1; i < 8; i++)
-		{
-			if(countMatrix[i][5] >= 3)
-			{
-				countMatrix[i][5] -= 3;
-				countMatrix[i-1][5]++;
-				countMatrix[i+1][5]++;
-				countMatrix[i][4]++;
-				colorMatrix[i][4] = colorMatrix[i][5];
-				colorMatrix[i-1][5] = colorMatrix[i][5];
-				colorMatrix[i+1][5] = colorMatrix[i][5];
-				if(countMatrix[i][5] == 0)
-					colorMatrix[i][5] = "";
-				sound.play();
-				break;
-			}
-		}
-		for(var i = 1; i < 5; i++)
-		{
-			if(countMatrix[0][i] >= 3)
-			{
-				countMatrix[0][i] -= 3;
-				countMatrix[1][i]++;
-				countMatrix[0][i-1]++;
-				countMatrix[0][i+1]++;
-				colorMatrix[1][i] = colorMatrix[0][i];
-				colorMatrix[0][i-1] = colorMatrix[0][i];
-				colorMatrix[0][i+1] = colorMatrix[0][i];
-				if(countMatrix[0][i] == 0)
-					colorMatrix[0][i] = "";
-				sound.play();
-				break;
-			}
-		}
-		for(var i = 1; i < 5; i++)
-		{
-			if(countMatrix[8][i] >= 3)
-			{
-				countMatrix[8][i] -= 3;
-				countMatrix[7][i]++;
-				countMatrix[8][i-1]++;
-				countMatrix[8][i+1]++;
-				colorMatrix[7][i] = colorMatrix[8][i];
-				colorMatrix[8][i-1] = colorMatrix[8][i];
-				colorMatrix[8][i+1] = colorMatrix[8][i];
-				if(countMatrix[8][i] == 0)
-					colorMatrix[8][i] = "";
-				sound.play();
-				break;
-			}
-		}
-		for(var i = 1; i < 8; i++)
-		{
-			for(var j = 1; j < 5; j++)
-			{
-				if(countMatrix[i][j] >= 4)
-				{
+
+		for(var i = 1; i < 8; i++){
+			for(var j = 1; j < 5; j++){
+				if(countMatrix[i][j] >= 4){
 					countMatrix[i][j] -= 4;
 					countMatrix[i-1][j]++;
 					countMatrix[i+1][j]++;
@@ -315,6 +236,19 @@ function updateMatrix()
 	}
 	checkGameOver();
 }
+
+function checkGameOver()
+{
+	if(gameOver() == 1 || gameOver() == 2)
+	{
+		isGameOver = true;
+		gameOverScreen(gameOver());
+		clearInterval(gameTimer);
+		setTimeout(initialise, 4000);
+	}
+}
+
+
 
 function notStable()
 {
