@@ -61,7 +61,11 @@ function matrixDefault()
 function drawArena()
 {
 	gameArena.clearRect(0, 0, width, height);
-	gameArena.strokeStyle = "black";
+	
+	if(turnCount % 2 == 0)
+		gameArena.strokeStyle = "red";
+	else
+		gameArena.strokeStyle = "green";
 
 	for(var counter = 1; counter < 6; counter++)
 	{
@@ -99,7 +103,7 @@ function drawArena()
 
 function undoGame()
 {
-	if(turnCount > 0 && flag == false)	
+	if(turnCount > 0 && flag == false)
 	{
 		flag = true;
 		turnCount--;
@@ -132,10 +136,10 @@ function gameLoop(event)
 	var rect = canvas.getBoundingClientRect();
 	var x = event.clientX - rect.left;
 	var y = event.clientY - rect.top;
-	
+
 	var row = Math.floor(x/gapWidth);
 	var column = Math.floor(y/gapHeight);
-	
+
 	if(!isGameOver)
 	{
 		takeBackUp();
