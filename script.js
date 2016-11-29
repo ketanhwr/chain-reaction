@@ -115,6 +115,9 @@ function undoGame()
 				colorMatrix[i][j] = undoColor[i][j];
 			}
 		}
+		$('#undo').click(function () {
+		    $('.undoMessage').stop().fadeIn(400).delay(2000).fadeOut(400); //fade out after 2 seconds
+		});
 	}
 
 }
