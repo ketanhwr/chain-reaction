@@ -7,6 +7,7 @@
 	</head>
 	<body>
 		<center>
+            <input id="playersCount" type="number" min="2" value="2" max="8" style="width: 3em;"/>
 			<div class="undo" id="undo">
 				<p>UNDO</p>
 			</div>
@@ -22,5 +23,6 @@
 			<script src="script.js"></script>
 		</center>
 		<div class='undoMessage' style='display:none' id ='undoError' >Only one move can be Undone!</div>
+        <div class='playersOut' id ='playersOut' ></div>
 	</body>
 </html>

@@ -12,6 +12,11 @@ var undoColor = new Array(9);
 var isGameOver = false;
 var counterAnimate = 0;
 var flag = false;
+var playerCount=2;
+var players = ["red","green","blue","yellow","orange","pink","aqua","teal"];
+var totalPlayers = 2;
+var playerNotOut = [];
+var gameStarted = false;
 
 var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
@@ -30,6 +35,11 @@ function initialise()
 	drawArena();
 	turnCount = 0;
 	counterAnimate = 0;
+    totalPlayers = 2;
+    playerNotOut = [];
+    gameStarted = false;
+    $("#playersCount").removeAttr("disabled");
+    $('.playersOut').text("");
 	gameTimer = setInterval(updateMatrix, gameSpeed);
 }
 
@@ -62,11 +72,14 @@ function drawArena()
 {
 	gameArena.clearRect(0, 0, width, height);
 	
-	if(turnCount % 2 == 0)
-		gameArena.strokeStyle = "red";
-	else
-		gameArena.strokeStyle = "green";
-
+    if(turnCount==0)
+    {
+        gameArena.strokeStyle = "red";
+    }
+    else
+    {
+        gameArena.strokeStyle = playerNotOut[turnCount % playerCount];
+    }
 	for(var counter = 1; counter < 6; counter++)
 	{
 		gameArena.beginPath();
@@ -143,34 +156,28 @@ function gameLoop(event)
 	var row = Math.floor(x/gapWidth);
 	var column = Math.floor(y/gapHeight);
 
+    if(!gameStarted)//Game starts when someone clicks on canvas (should use start button?)
+    {
+        totalPlayers = parseInt($("#playersCount").val());
+        playerCount = parseInt($("#playersCount").val());
+        $("#playersCount").attr("disabled","true");
+        for(var i=0;i<totalPlayers;i++)
+        {
+            playerNotOut.push(players[i]);
+        }
+        gameStarted=true;
+    }
+    
 	if(!isGameOver)
 	{
 		takeBackUp();
-		if(turnCount%2 == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
-		{
-			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "red";
-			turnCount++;
-			flag = false;
-		}
-		if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
-		{
-			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "green";
-			turnCount++;
-			flag = false;
-		}
-	}
-}
-
-function checkGameOver()
-{
-	if(gameOver() == 1 || gameOver() == 2)
-	{
-		isGameOver = true;
-		gameOverScreen(gameOver());
-		clearInterval(gameTimer);
-		setTimeout(initialise, 4000);
+        if(colorMatrix[column][row] == "" || colorMatrix[column][row] == playerNotOut[turnCount % playerCount])
+        {
+            countMatrix[column][row]++;		//Weird graphic coordinate-system
+            colorMatrix[column][row] = playerNotOut[turnCount % playerCount];
+            turnCount++;
+            flag = false; 
+        }
 	}
 }
 
@@ -257,7 +264,7 @@ function updateMatrix()
 
 function checkGameOver()
 {
-	if(gameOver() == 1 || gameOver() == 2)
+	if(gameOver())
 	{
 		isGameOver = true;
 		gameOverScreen(gameOver());
@@ -292,49 +299,60 @@ function notStable()
 
 function gameOver()
 {
-	var countRed = 0;
-	var countGreen = 0;
+    var countColors = new Array(playerCount);
+    for(var i=0;i<playerCount;i++)
+    {
+        countColors[i]=0;
+    }
 	for(var i = 0; i < 9; i++)
 	{
 		for(var j = 0;j < 6; j++)
 		{
-			if(colorMatrix[i][j] == "red") countRed++;
-			if(colorMatrix[i][j] == "green") countGreen++;
-		}
+            if(colorMatrix[i][j])
+            {
+                countColors[playerNotOut.indexOf(colorMatrix[i][j])]++;
+            }
+        }
 	}
-	if(turnCount > 1)
+	if(turnCount > (playerCount-1))
 	{
-		if(countRed == 0)
-		{
-			return 2;
-		}
-		if(countGreen == 0)
-		{
-			return 1;
-		}
+        var playersOut = "";
+        var loopLength=playerCount;
+        for(var i=0;i<loopLength;i++)
+        {
+            if(countColors[i]==0)
+            {
+                playersOut += players[i]+" ";
+                playerCount--;
+                turnCount++;
+                playerNotOut = playerNotOut.filter(item => item !== players[i]);
+            }
+        }
+        if(playerCount<2)
+        {
+            return playerNotOut[0];
+        }
+        else
+        {
+            if(playersOut)
+            {
+                if($('.playersOut').text()!==(playersOut))
+                {
+                    $('.playersOut').text(playersOut + ":: Out!!!");
+                }
+            }
+        }
 	}
 }
 
 function gameOverScreen(player)
 {
-	if(player == 2)
-	{
-		gameArena.clearRect(0, 0, width, height);
-		gameArena.fillStyle = "black";
-		gameArena.fillRect(0, 0, width, height);
-		gameArena.fillStyle = "white";
-		gameArena.font = "40px Times New Roman";
-		gameArena.fillText("Player 2 wins!", width/2 - 150, height/2 - 50);
-	}
-	else
-	{
-		gameArena.clearRect(0, 0, width, height);
-		gameArena.fillStyle = "black";
-		gameArena.fillRect(0, 0, width, height);
-		gameArena.fillStyle = "white";
-		gameArena.font = "40px Times New Roman";
-		gameArena.fillText("Player 1 wins!", width/2 - 150, height/2 - 50);
-	}
+    gameArena.clearRect(0, 0, width, height);
+    gameArena.fillStyle = "black";
+    gameArena.fillRect(0, 0, width, height);
+    gameArena.fillStyle = "white";
+    gameArena.font = "40px Times New Roman";
+    gameArena.fillText("Player "+player+" wins!", width/2 - 150, height/2 - 50);
 }
 
 function oneCircle(row, column, color)
