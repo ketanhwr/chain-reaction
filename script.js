@@ -136,6 +136,7 @@ function takeBackUp()
 
 function gameLoop(event)
 {
+    event.preventDefault();
 	var rect = canvas.getBoundingClientRect();
 	var x = event.clientX - rect.left;
 	var y = event.clientY - rect.top;
@@ -149,14 +150,18 @@ function gameLoop(event)
 		if(turnCount%2 == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "red";
+            colorMatrix[column][row] = "red";
+            document.getElementById('identity').innerHTML = "Greens's Turn";
+            document.getElementById('identity').style.color = "green";
 			turnCount++;
 			flag = false;
 		}
 		if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "green";
+            colorMatrix[column][row] = "green";
+            document.getElementById('identity').innerHTML = "Red's Turn";
+            document.getElementById('identity').style.color = "red";
 			turnCount++;
 			flag = false;
 		}
