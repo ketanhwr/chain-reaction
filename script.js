@@ -12,7 +12,7 @@ var undoColor = new Array(9);
 var isGameOver = false;
 var counterAnimate = 0;
 var flag = false;
-
+var turnIndicator = document.getElementById('turnIndicator');
 var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
 var sound = document.getElementById("sound");
@@ -151,12 +151,16 @@ function gameLoop(event)
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
 			colorMatrix[column][row] = "red";
 			turnCount++;
+			turnIndicator.innerHTML = "Green's Turn";
+			turnIndicator.style.color = 'green';
 			flag = false;
 		}
 		if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
 			colorMatrix[column][row] = "green";
+			turnIndicator.innerHTML = "Red's Turn";
+			turnIndicator.style.color = 'red';
 			turnCount++;
 			flag = false;
 		}
