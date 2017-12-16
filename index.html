@@ -7,9 +7,23 @@
 	</head>
 	<body>
 		<center>
-			<div class="undo" id="undo">
-				<p>UNDO</p>
-			</div>
+				<div>
+					<div class="undo" id="undo">
+						<p>UNDO</p>
+					</div>
+					<div>
+						<p class="numOfPlayersTag">Num of Players:</p>
+						<div class="numOfPlayersDropDown">
+							<form>
+							 	<select id="numOfPlayers" onchange="setNumberOfPlayers()">
+								  <option value=2>2</option>
+								  <option value=3>3</option>
+								  <option value=4>4</option>
+								</select>
+							</form>
+						</div>
+					</div>
+				</div>
 			<canvas width="420" height="630" id="arena">
 				Canvas tag not supported!
 			</canvas>
@@ -22,5 +36,6 @@
 			<script src="script.js"></script>
 		</center>
 		<div class='undoMessage' style='display:none' id ='undoError' >Only one move can be Undone!</div>
+		<div class='undoMessage' style='display:none' id ='changePlayerError' >Cannot change number of players after game has started!</div>
 	</body>
 </html>

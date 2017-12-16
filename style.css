@@ -51,3 +51,11 @@ canvas
     -moz-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
     box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
 }
+
+.numOfPlayersTag {
+    color:white;
+}
+
+.numOfPlayersDropDown {
+    margin-bottom: 20px;
+}

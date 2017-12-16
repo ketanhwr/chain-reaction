@@ -3,6 +3,7 @@ var height = 630;
 var gapWidth = width/6;
 var gapHeight = height/9;
 var turnCount = 0;
+var turnCountBackup = 0;
 var gameSpeed = 300;
 var gameTimer;
 var countMatrix = new Array(9);
@@ -11,7 +12,12 @@ var undoCount = new Array(9)
 var undoColor = new Array(9);
 var isGameOver = false;
 var counterAnimate = 0;
+var gameStarted = false; // tracks if game has begun
 var flag = false;
+var maxPlayerCount = 2; // number of players in game
+var playersEliminated = {red:false,green:false,blue:false,yellow:false};
+var playersEliminatedUndo = {red:false,green:false,blue:false,yellow:false}; //backup copy for undo function
+var round = 0; //number of turns taken collectively by players
 
 var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
@@ -29,6 +35,11 @@ function initialise()
 	matrixDefault();
 	drawArena();
 	turnCount = 0;
+	turnCountBackup=0;
+	gameStarted = false;
+	round = 0;
+	playersEliminated = {red:false,green:false,blue:false,yellow:false};
+	playersEliminatedUndo = {red:false,green:false,blue:false,yellow:false};
 	counterAnimate = 0;
 	gameTimer = setInterval(updateMatrix, gameSpeed);
 }
@@ -44,6 +55,16 @@ function initialiseMatrix()
 	}
 }
 
+function setNumberOfPlayers()
+{
+	if (!gameStarted)
+	{
+		maxPlayerCount = parseInt(document.getElementById("numOfPlayers").value);
+	} else {
+		 $('#changePlayerError').stop().fadeIn(400).delay(2000).fadeOut(400); //fade out after 2 seconds
+	}
+
+}
 function matrixDefault()
 {
 	for(var i = 0; i < 9; i++)
@@ -61,11 +82,61 @@ function matrixDefault()
 function drawArena()
 {
 	gameArena.clearRect(0, 0, width, height);
-	
-	if(turnCount % 2 == 0)
-		gameArena.strokeStyle = "red";
-	else
-		gameArena.strokeStyle = "green";
+
+	if(turnCount === 0)
+	{
+		if (!playersEliminated['red'])
+		{
+			gameArena.strokeStyle = "red";
+		}
+		else
+		{
+			turnCount++;
+			resetTurnCount();
+			drawArena();
+		}
+
+	}
+	else if (turnCount === 1)
+	{
+		if (!playersEliminated['green'])
+		{
+			gameArena.strokeStyle = "green";
+		}
+		else
+		{
+			turnCount++;
+			resetTurnCount();
+			drawArena();
+		}
+
+	}
+	else if (turnCount === 2)
+	{
+		if (!playersEliminated['blue'])
+		{
+			gameArena.strokeStyle = "blue";
+		}
+		else
+		{
+			turnCount++;
+			resetTurnCount();
+			drawArena();
+		}
+	}
+	else if (turnCount === 3)
+	{
+		if (!playersEliminated['yellow'])
+		{
+			gameArena.strokeStyle = "yellow";
+		}
+		else
+		{
+			turnCount++;
+			resetTurnCount();
+			drawArena();
+		}
+	}
 
 	for(var counter = 1; counter < 6; counter++)
 	{
@@ -101,12 +172,24 @@ function drawArena()
 	}
 }
 
+// Next 2 Functions are used to undo board
+function restoreTurnCountToBackup()
+{
+	turnCount = turnCountBackup;
+}
+
+function backUpTurnCount()
+{
+	turnCountBackup = turnCount;
+}
+
 function undoGame()
 {
-	if(turnCount > 0 && flag == false)
+	if(round > 0 && flag == false)
 	{
+		restoreTurnCountToBackup();
 		flag = true;
-		turnCount--;
+		restoreCopyofPlayersEliminated();
 		for(var i = 0; i < 9; i++)
 		{
 			for(var j = 0; j < 6; j++)
@@ -115,7 +198,7 @@ function undoGame()
 				colorMatrix[i][j] = undoColor[i][j];
 			}
 		}
-		
+
 	} else {
 		 $('.undoMessage').stop().fadeIn(400).delay(2000).fadeOut(400); //fade out after 2 seconds
 	}
@@ -124,6 +207,8 @@ function undoGame()
 
 function takeBackUp()
 {
+	backUpCopyofPlayersEliminated();
+
 	for(var i = 0; i < 9; i++)
 	{
 		for(var j = 0; j < 6; j++)
@@ -136,6 +221,11 @@ function takeBackUp()
 
 function gameLoop(event)
 {
+	if (event) {
+		backUpTurnCount();
+		gameStarted = true; // can no longer change number of players
+	}
+
 	var rect = canvas.getBoundingClientRect();
 	var x = event.clientX - rect.left;
 	var y = event.clientY - rect.top;
@@ -146,26 +236,72 @@ function gameLoop(event)
 	if(!isGameOver)
 	{
 		takeBackUp();
-		if(turnCount%2 == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
+		if(turnCount == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
 		{
-			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "red";
+			if (!playersEliminated['red'])
+			{
+				countMatrix[column][row]++;		//Weird graphic coordinate-system
+				colorMatrix[column][row] = "red";
+				flag = false;
+			}
+
 			turnCount++;
-			flag = false;
+			round++;
+ 		}
+
+		if(turnCount == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
+		{
+			if (!playersEliminated['green'] )
+			{
+				countMatrix[column][row]++;		//Weird graphic coordinate-system
+				colorMatrix[column][row] = "green";
+				flag = false;
+			}
+
+			turnCount++;
+			round++;
+			resetTurnCount();
+
 		}
-		if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
+		if(turnCount == 2 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "blue"))
 		{
-			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "green";
+			if (!playersEliminated['blue'])
+			{
+				countMatrix[column][row]++;		//Weird graphic coordinate-system
+				colorMatrix[column][row] = "blue";
+				flag = false;
+			}
+
 			turnCount++;
-			flag = false;
+			round++;
+			resetTurnCount();
+
+		}
+		if(turnCount == 3 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "yellow"))
+		{
+			if (!playersEliminated['yellow'])
+			{
+				countMatrix[column][row]++;		//Weird graphic coordinate-system
+				colorMatrix[column][row] = "yellow";
+				flag = false;
+			}
+
+			turnCount++;
+			round++;
+			resetTurnCount();
 		}
 	}
 }
 
+function resetTurnCount() {
+	if (turnCount === maxPlayerCount)
+	{
+			turnCount = 0;
+	}
+}
 function checkGameOver()
 {
-	if(gameOver() == 1 || gameOver() == 2)
+	if(gameOver() == 1 || gameOver() == 2 || gameOver() == 3 || gameOver() == 4)
 	{
 		isGameOver = true;
 		gameOverScreen(gameOver());
@@ -257,7 +393,7 @@ function updateMatrix()
 
 function checkGameOver()
 {
-	if(gameOver() == 1 || gameOver() == 2)
+	if(gameOver() == 1 || gameOver() == 2 || gameOver() == 3 || gameOver() == 4)
 	{
 		isGameOver = true;
 		gameOverScreen(gameOver());
@@ -265,8 +401,6 @@ function checkGameOver()
 		setTimeout(initialise, 4000);
 	}
 }
-
-
 
 function notStable()
 {
@@ -290,27 +424,76 @@ function notStable()
 	return ans;
 }
 
+// Next 2 Functions are used to undo elimination of players
+function backUpCopyofPlayersEliminated() {
+	playersEliminatedUndo = Object.assign({}, playersEliminated);
+}
+
+function restoreCopyofPlayersEliminated() {
+	playersEliminated = Object.assign({}, playersEliminatedUndo);
+}
+
 function gameOver()
 {
 	var countRed = 0;
 	var countGreen = 0;
+	var countBlue = 0;
+	var countYellow = 0;
+
 	for(var i = 0; i < 9; i++)
 	{
 		for(var j = 0;j < 6; j++)
 		{
 			if(colorMatrix[i][j] == "red") countRed++;
 			if(colorMatrix[i][j] == "green") countGreen++;
+			if(colorMatrix[i][j] == "blue") countBlue++;
+			if(colorMatrix[i][j] == "yellow") countYellow++;
 		}
 	}
-	if(turnCount > 1)
+
+	// checks if player has been eliminated
+	// if so, they cannot have any more turns
+	if(round > maxPlayerCount)
 	{
-		if(countRed == 0)
+		if (countRed === 0 && !playersEliminated['red'])
+		{
+			playersEliminated['red'] = true;
+		}
+
+		if (countGreen === 0 && !playersEliminated['green'])
+		{
+			playersEliminated['green'] = true;
+		}
+
+		if (countBlue === 0 && !playersEliminated['blue'])
+		{
+			playersEliminated['blue'] = true;
+		}
+
+		if (countYellow === 0 && !playersEliminated['yellow'])
+		{
+			playersEliminated['yellow'] = true;
+		}
+
+		// checks to see if all but one players have been eliminated
+		if (countGreen === 0 && countBlue === 0 && countYellow === 0 )
+		{
+			return 1;
+		}
+
+		if (countRed === 0 && countBlue === 0 && countYellow === 0 )
 		{
 			return 2;
 		}
-		if(countGreen == 0)
+
+		if (countRed === 0 && countGreen === 0 && countYellow === 0 )
 		{
-			return 1;
+			return 3;
+		}
+
+		if (countRed === 0 && countGreen === 0 && countBlue === 0 )
+		{
+			return 4;
 		}
 	}
 }
@@ -326,7 +509,7 @@ function gameOverScreen(player)
 		gameArena.font = "40px Times New Roman";
 		gameArena.fillText("Player 2 wins!", width/2 - 150, height/2 - 50);
 	}
-	else
+	else if (player == 1)
 	{
 		gameArena.clearRect(0, 0, width, height);
 		gameArena.fillStyle = "black";
@@ -334,6 +517,24 @@ function gameOverScreen(player)
 		gameArena.fillStyle = "white";
 		gameArena.font = "40px Times New Roman";
 		gameArena.fillText("Player 1 wins!", width/2 - 150, height/2 - 50);
+	}
+	else if (player == 3)
+	{
+		gameArena.clearRect(0, 0, width, height);
+		gameArena.fillStyle = "black";
+		gameArena.fillRect(0, 0, width, height);
+		gameArena.fillStyle = "white";
+		gameArena.font = "40px Times New Roman";
+		gameArena.fillText("Player 3 wins!", width/2 - 150, height/2 - 50);
+	}
+	else if (player == 4)
+	{
+		gameArena.clearRect(0, 0, width, height);
+		gameArena.fillStyle = "black";
+		gameArena.fillRect(0, 0, width, height);
+		gameArena.fillStyle = "white";
+		gameArena.font = "40px Times New Roman";
+		gameArena.fillText("Player 4 wins!", width/2 - 150, height/2 - 50);
 	}
 }
 
