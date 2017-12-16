@@ -7,10 +7,11 @@
 	</head>
 	<body>
 		<center>
-            <input id="playersCount" type="number" min="2" value="2" max="8" style="width: 3em;"/>
+          <label style="color:white;">Number of players:</label>  <input id="playersCount" type="number" min="2" value="2" max="8" style="width: 3em;"/>
 			<div class="undo" id="undo">
 				<p>UNDO</p>
 			</div>
+            <h2 id="turnIndicator" style="color:red;">RED's turn</h2>
 			<canvas width="420" height="630" id="arena">
 				Canvas tag not supported!
 			</canvas>

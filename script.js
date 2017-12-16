@@ -14,6 +14,7 @@ var counterAnimate = 0;
 var flag = false;
 var playerCount = 2;
 var players = ["red", "green", "blue", "yellow", "orange", "pink", "aqua", "teal"];
+var turnIndicator = document.getElementById('turnIndicator');
 var totalPlayers = 2;
 var playerNotOut = [];
 var gameStarted = false;
@@ -146,6 +147,16 @@ function gameLoop(event) {
         if(colorMatrix[column][row] == "" || colorMatrix[column][row] == playerNotOut[turnCount % playerCount]) {
             countMatrix[column][row]++;    //Weird graphic coordinate-system
             colorMatrix[column][row] = playerNotOut[turnCount % playerCount];
+            // this has to select the next player 
+
+            if (typeof playerNotOut[(turnCount % playerCount) + 1] != "undefined") {
+                turnIndicator.innerHTML = String(playerNotOut[(turnCount % playerCount) + 1]).toUpperCase() + " 's Turn";
+                turnIndicator.style.color = String(playerNotOut[(turnCount % playerCount) + 1]);
+            } else {// if the next one doesnt exsist, use first element 
+                turnIndicator.innerHTML = String(playerNotOut[0]).toUpperCase() + " 's Turn";
+                turnIndicator.style.color = String(playerNotOut[0]);
+            }
+
             turnCount++;
             flag = false;
         }
