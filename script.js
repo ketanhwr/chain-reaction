@@ -251,9 +251,10 @@ function checkGameOver()
 	{
 		isGameOver = true;
 		document.getElementById("undo").style.visibility = "hidden";
-		gameOverScreen(gameOver());
+		drawArena();
+		setTimeout(gameOverScreen.bind(null,gameOver()), 2000);
 		clearInterval(gameTimer);
-		setTimeout(initialise, 4000);
+		setTimeout(initialise, 6000);
 	}
 }
 
