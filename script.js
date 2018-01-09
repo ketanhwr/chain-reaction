@@ -25,6 +25,7 @@ initialise();
 
 function initialise()
 {
+	document.getElementById("undo").style.visibility = "visible";
 	isGameOver = false;
 	matrixDefault();
 	drawArena();
@@ -163,17 +164,6 @@ function gameLoop(event)
 	}
 }
 
-function checkGameOver()
-{
-	if(gameOver() == 1 || gameOver() == 2)
-	{
-		isGameOver = true;
-		gameOverScreen(gameOver());
-		clearInterval(gameTimer);
-		setTimeout(initialise, 4000);
-	}
-}
-
 function populateCornerCells(i, j){
 	countMatrix[i][j] -= 2;
 	countMatrix[ i == 8 ? i-1 : i+1 ][j]++;
@@ -260,6 +250,7 @@ function checkGameOver()
 	if(gameOver() == 1 || gameOver() == 2)
 	{
 		isGameOver = true;
+		document.getElementById("undo").style.visibility = "hidden";
 		gameOverScreen(gameOver());
 		clearInterval(gameTimer);
 		setTimeout(initialise, 4000);
