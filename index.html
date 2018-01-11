@@ -1,26 +1,38 @@
-<!DOCTYPE HTML>
-<html>
-	<head>
-		<link rel="stylesheet" type="text/css" href="style.css">
-		<title>Chain Reaction!</title>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-	</head>
-	<body>
-		<center>
-			<div class="undo" id="undo">
-				<p>UNDO</p>
-			</div>
-			<canvas width="420" height="630" id="arena">
-				Canvas tag not supported!
-			</canvas>
-			<audio src="point_sound.mp3" id="sound">
-				Audio tag not supported!
-			</audio>
-			<center>
-				<a href="https://brilliant.org/wiki/chain-reaction-game/" target="_blank">Rules</a>
-			</center>
-			<script src="script.js"></script>
-		</center>
-		<div class='undoMessage' style='display:none' id ='undoError' >Only one move can be Undone!</div>
-	</body>
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Chain Reaction!</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div class="settings">
+	<label for="horizontalCells">Horizontal cells: </label>
+	<input id="horizontalCells" type="range" min="3" max="12" value="6" />
+	<span id="horizontalCellsVal">6</span>
+	<br />
+	<label for="verticalCells">Vertical cells: </label>
+	<input id="verticalCells" type="range" min="6" max="20" value="9" />
+	<span id="verticalCellsVal">9</span>
+	<br />
+	<button id="startGameButton">Play!</button>
+</div>
+<center>
+	<div class="undo" id="undo">
+		<p>UNDO</p>
+	</div>
+	<canvas width="420" height="630" id="arena">
+		Canvas tag not supported!
+	</canvas>
+	<audio src="point_sound.mp3" id="sound">
+		Audio tag not supported!
+	</audio>
+	<center>
+		<a href="https://brilliant.org/wiki/chain-reaction-game/" target="_blank">Rules</a>
+	</center>
+</center>
+<div class='undoMessage' style='display:none' id ='undoError' >Only one move can be Undone!</div>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="script.js"></script>
+</body>
 </html>

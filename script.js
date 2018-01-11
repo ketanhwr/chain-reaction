@@ -1,27 +1,52 @@
-var width = 420;
-var height = 630;
-var gapWidth = width/6;
-var gapHeight = height/9;
+var horizontalCells;
+var verticalCells;
+
+var width;
+var height;
+var gapWidth;
+var gapHeight;
+var ballRadius;
+var ballBorderSize;
 var turnCount = 0;
 var gameSpeed = 300;
 var gameTimer;
-var countMatrix = new Array(9);
-var colorMatrix = new Array(9);
-var undoCount = new Array(9)
-var undoColor = new Array(9);
+var countMatrix;
+var colorMatrix;
+var undoCount;
+var undoColor;
 var isGameOver = false;
 var counterAnimate = 0;
 var flag = false;
 
 var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
+var startButton = document.getElementById("startGameButton");
 var sound = document.getElementById("sound");
 var gameArena = canvas.getContext("2d");
+var horizontalCellsSlider = document.getElementById("horizontalCells");
+var verticalCellsSlider = document.getElementById("verticalCells");
+
+
 canvas.addEventListener("click", gameLoop);
 button.addEventListener("click", undoGame);
+startButton.addEventListener("click", startGame);
+horizontalCellsSlider.addEventListener("change", updateSliderVals);
+verticalCellsSlider.addEventListener("change", updateSliderVals);
 
-initialiseMatrix();
-initialise();
+startGame();
+
+function startGame(){
+	horizontalCells = horizontalCellsSlider.value;
+	verticalCells = verticalCellsSlider.value;
+	initialiseValues();
+	initialiseMatrix();
+	initialise();
+}
+
+function updateSliderVals(){
+	$("#horizontalCellsVal").html(horizontalCellsSlider.value);
+	$("#verticalCellsVal").html(verticalCellsSlider.value);
+}
 
 function initialise()
 {
@@ -34,22 +59,42 @@ function initialise()
 	gameTimer = setInterval(updateMatrix, gameSpeed);
 }
 
+function initialiseValues(){
+    width = canvas.offsetWidth;
+    height = canvas.offsetHeight;
+    gapWidth = width / horizontalCells;
+    gapHeight = height / verticalCells;
+    if(gapWidth < gapHeight) {
+        ballRadius = (gapWidth / 4.7);
+        ballBorderSize = (gapWidth / 25);
+    }
+    else {
+        ballRadius = (gapHeight/4.7);
+        ballBorderSize = (gapHeight / 25);
+    }
+
+    countMatrix = new Array(verticalCells);
+    colorMatrix = new Array(verticalCells);
+    undoCount = new Array(verticalCells);
+    undoColor = new Array(verticalCells);
+}
+
 function initialiseMatrix()
 {
-	for(var counter = 0; counter < 9; counter++)
+	for(var counter = 0; counter < verticalCells; counter++)
 	{
-		countMatrix[counter] = new Array(6);
-		colorMatrix[counter] = new Array(6);
-		undoCount[counter] = new Array(6);
-		undoColor[counter] = new Array(6);
+		countMatrix[counter] = new Array(horizontalCells);
+		colorMatrix[counter] = new Array(horizontalCells);
+		undoCount[counter] = new Array(horizontalCells);
+		undoColor[counter] = new Array(horizontalCells);
 	}
 }
 
 function matrixDefault()
 {
-	for(var i = 0; i < 9; i++)
+	for(var i = 0; i < verticalCells; i++)
 	{
-		for(var j = 0; j < 6; j++)
+		for(var j = 0; j < horizontalCells; j++)
 		{
 			colorMatrix[i][j] = "";		//No color
 			countMatrix[i][j] = 0;		//No value
@@ -68,7 +113,7 @@ function drawArena()
 	else
 		gameArena.strokeStyle = "green";
 
-	for(var counter = 1; counter < 6; counter++)
+	for(var counter = 1; counter < horizontalCells; counter++)
 	{
 		gameArena.beginPath();
 		gameArena.moveTo(counter*gapWidth, 0);
@@ -77,7 +122,7 @@ function drawArena()
 		gameArena.stroke();
 	}
 
-	for(var counter = 1; counter < 9; counter++)
+	for(var counter = 1; counter < verticalCells; counter++)
 	{
 		gameArena.beginPath();
 		gameArena.moveTo(0 , counter*gapHeight);
@@ -86,9 +131,9 @@ function drawArena()
 		gameArena.stroke();
 	}
 
-	for(var i = 0; i < 9; i++)
+	for(var i = 0; i < verticalCells; i++)
 	{
-		for(var j = 0; j < 6; j++)
+		for(var j = 0; j < horizontalCells; j++)
 		{
 			if(countMatrix[i][j] == 0)
 				continue;
@@ -108,9 +153,9 @@ function undoGame()
 	{
 		flag = true;
 		turnCount--;
-		for(var i = 0; i < 9; i++)
+		for(var i = 0; i < verticalCells; i++)
 		{
-			for(var j = 0; j < 6; j++)
+			for(var j = 0; j < horizontalCells; j++)
 			{
 				countMatrix[i][j] = undoCount[i][j];
 				colorMatrix[i][j] = undoColor[i][j];
@@ -125,9 +170,9 @@ function undoGame()
 
 function takeBackUp()
 {
-	for(var i = 0; i < 9; i++)
+	for(var i = 0; i < verticalCells; i++)
 	{
-		for(var j = 0; j < 6; j++)
+		for(var j = 0; j < horizontalCells; j++)
 		{
 			undoCount[i][j] = countMatrix[i][j];
 			undoColor[i][j] = colorMatrix[i][j];
@@ -166,10 +211,10 @@ function gameLoop(event)
 
 function populateCornerCells(i, j){
 	countMatrix[i][j] -= 2;
-	countMatrix[ i == 8 ? i-1 : i+1 ][j]++;
-	countMatrix[i][ j==5 ? j-1 : j+1 ]++;
-	colorMatrix[ i == 8 ? i-1 : i+1 ][j] = colorMatrix[i][j];
-	colorMatrix[i][ j==5 ? j-1 : j+1 ] = colorMatrix[i][j];
+	countMatrix[ i == (verticalCells - 1) ? i-1 : i+1 ][j]++;
+	countMatrix[i][ j== (horizontalCells - 1) ? j-1 : j+1 ]++;
+	colorMatrix[ i == (verticalCells - 1) ? i-1 : i+1 ][j] = colorMatrix[i][j];
+	colorMatrix[i][ j== (horizontalCells - 1) ? j-1 : j+1 ] = colorMatrix[i][j];
 	if(countMatrix[i][j] == 0)
 		colorMatrix[i][j] = "";
 	sound.play();
@@ -205,24 +250,29 @@ function updateMatrix()
 {
 	counterAnimate++;
 	drawArena();
-	var cornerCord = [[0,0], [8,0], [8,5], [0,5]];
+	var cornerCord = [
+        [0,0],
+        [(verticalCells - 1),0],
+        [(verticalCells - 1),(horizontalCells - 1)],
+        [0,(horizontalCells - 1)]
+    ];
 
 	while(notStable()){
 		for(var i = 0; i < 4;i++)
 			if(countMatrix[cornerCord[i][0]][cornerCord[i][1]] >= 2){ populateCornerCells(cornerCord[i][0], cornerCord[i][1]); break; }
 
-		for(var i = 1; i < 8; i++){
+		for(var i = 1; i < (verticalCells - 1); i++){
 			if(countMatrix[i][0] >= 3){ populateSideHCells(i, 0); break; }
-			if(countMatrix[i][5] >= 3){ populateSideHCells(i, 5); break; }
+			if(countMatrix[i][horizontalCells - 1] >= 3){ populateSideHCells(i, (horizontalCells - 1)); break; }
 		}
 
-		for(var i = 1; i < 5; i++){
+		for(var i = 1; i < (horizontalCells - 1); i++){
 			if(countMatrix[0][i] >= 3){ populateSideWCells(0, i); break; }
-			if(countMatrix[8][i] >= 3){ populateSideWCells(8, i); break; }
+			if(countMatrix[verticalCells - 1][i] >= 3){ populateSideWCells(verticalCells - 1, i); break; }
 		}
 
-		for(var i = 1; i < 8; i++){
-			for(var j = 1; j < 5; j++){
+		for(var i = 1; i < verticalCells - 1; i++){
+			for(var j = 1; j < horizontalCells - 1; j++){
 				if(countMatrix[i][j] >= 4){
 					countMatrix[i][j] -= 4;
 					countMatrix[i-1][j]++;
@@ -258,24 +308,25 @@ function checkGameOver()
 	}
 }
 
-
-
 function notStable()
 {
 	var ans = false;
-	if(countMatrix[0][0] >= 2 || countMatrix[8][0] >= 2 || countMatrix[8][5] >= 2 || countMatrix[0][5] >= 2)
+	if(countMatrix[0][0] >= 2
+        || countMatrix[verticalCells - 1][0] >= 2
+        || countMatrix[verticalCells - 1][horizontalCells - 1] >= 2
+        || countMatrix[0][horizontalCells - 1] >= 2)
 		ans = true;
 
-	for(var i = 1; i < 8; i++)
-		if(countMatrix[i][0] >= 3 || countMatrix[i][5] >= 3)
+	for(var i = 1; i < verticalCells - 1; i++)
+		if(countMatrix[i][0] >= 3 || countMatrix[i][horizontalCells - 1] >= 3)
 			ans = true;
 
-	for(var i = 1; i < 5; i++)
-		if(countMatrix[0][i] >= 3 || countMatrix[8][i] >= 3)
+	for(var i = 1; i < horizontalCells - 1; i++)
+		if(countMatrix[0][i] >= 3 || countMatrix[verticalCells - 1][i] >= 3)
 			ans = true;
 
-	for(var i = 1; i < 8; i++)
-		for(var j = 1; j < 8; j++)
+	for(var i = 1; i < verticalCells - 1; i++)
+		for(var j = 1; j < verticalCells - 1; j++)
 			if(countMatrix[i][j] >= 4)
 				ans = true;
 
@@ -286,9 +337,9 @@ function gameOver()
 {
 	var countRed = 0;
 	var countGreen = 0;
-	for(var i = 0; i < 9; i++)
+	for(var i = 0; i < verticalCells; i++)
 	{
-		for(var j = 0;j < 6; j++)
+		for(var j = 0;j < horizontalCells; j++)
 		{
 			if(colorMatrix[i][j] == "red") countRed++;
 			if(colorMatrix[i][j] == "green") countGreen++;
@@ -332,10 +383,13 @@ function gameOverScreen(player)
 function oneCircle(row, column, color)
 {
 	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 35, row*gapHeight + 35, 15, 0, Math.PI*2);
+	gameArena.arc(column*gapWidth + (gapWidth/2), row*gapHeight + (gapHeight/2), ballRadius, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
-	if((row == 0 && column == 0) || (row == 8 && column == 0) || (row == 0 && column == 5) || (row == 8 && column == 5))
+	if((row == 0 && column == 0)
+        || (row == (verticalCells-1) && column == 0)
+        || (row == 0 && column == (horizontalCells-1))
+        || (row == (verticalCells-1) && column == (horizontalCells-1)))
 	{
 		if(counterAnimate%2 == 0)
 			gameArena.strokeStyle = "black";
@@ -346,7 +400,7 @@ function oneCircle(row, column, color)
 	{
 		gameArena.strokeStyle = "black";
 	}
-	gameArena.lineWidth = 3;
+	gameArena.lineWidth = ballBorderSize;
 	gameArena.stroke();
 	gameArena.closePath();
 	gameArena.lineWidth = 1;
@@ -355,10 +409,11 @@ function oneCircle(row, column, color)
 function twoCircle(row, column, color)
 {
 	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 20, row*gapHeight + 35, 15, 0, Math.PI*2);
+	gameArena.arc(column*gapWidth + (gapWidth/3.5), row*gapHeight + (gapHeight/2), ballRadius, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
-	if(((row >= 1 && row < 8) && (column == 0 || column == 5)) || ((row == 0 || row == 8) && (column >= 1 && column < 5)))
+	if(((row >= 1 && row < (verticalCells-1)) && (column == 0 || column == (horizontalCells-1)))
+        || ((row == 0 || row == (verticalCells-1)) && (column >= 1 && column < (horizontalCells-1))))
 	{
 		if(counterAnimate%2 == 0)
 			gameArena.strokeStyle = "black";
@@ -369,16 +424,17 @@ function twoCircle(row, column, color)
 	{
 		gameArena.strokeStyle = "black";
 	}
-	gameArena.lineWidth = 3;
+	gameArena.lineWidth = ballBorderSize;
 	gameArena.stroke();
 	gameArena.closePath();
 	gameArena.lineWidth = 1;
 
 	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 50, row*gapHeight + 35, 15, 0, Math.PI*2);
+	gameArena.arc(column*gapWidth + (gapWidth/1.4), row*gapHeight + (gapHeight/2), ballRadius, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
-	if(((row >= 1 && row < 8) && (column == 0 || column == 5)) || ((row == 0 || row == 8) && (column >= 1 && column < 5)))
+	if(((row >= 1 && row < (verticalCells-1)) && (column == 0 || column == horizontalCells-1))
+        || ((row == 0 || row == verticalCells-1) && (column >= 1 && column < horizontalCells-1)))
 	{
 		if(counterAnimate%2 == 0)
 			gameArena.strokeStyle = "black";
@@ -389,7 +445,7 @@ function twoCircle(row, column, color)
 	{
 		gameArena.strokeStyle = "black";
 	}
-	gameArena.lineWidth = 3;
+	gameArena.lineWidth = ballBorderSize;
 	gameArena.stroke();
 	gameArena.closePath();
 	gameArena.lineWidth = 1;
@@ -398,40 +454,40 @@ function twoCircle(row, column, color)
 function threeCircle(row, column, color)
 {
 	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 20, row*gapHeight + 17, 15, 0, Math.PI*2);
+	gameArena.arc(column*gapWidth + (gapWidth/3.5), row*gapHeight + (gapHeight/4.1), ballRadius, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
 	if(counterAnimate%2 == 0)
 		gameArena.strokeStyle = "black";
 	else
 		gameArena.strokeStyle = color;
-	gameArena.lineWidth = 3;
+	gameArena.lineWidth = ballBorderSize;
 	gameArena.stroke();
 	gameArena.closePath();
 	gameArena.lineWidth = 1;
 
 	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 20, row*gapHeight + 53, 15, 0, Math.PI*2);
+	gameArena.arc(column*gapWidth + (gapWidth/3.5), row*gapHeight + (gapHeight/1.3), ballRadius, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
 	if(counterAnimate%2 == 0)
 		gameArena.strokeStyle = "black";
 	else
 		gameArena.strokeStyle = color;
-	gameArena.lineWidth = 3;
+	gameArena.lineWidth = ballBorderSize;
 	gameArena.stroke();
 	gameArena.closePath();
 	gameArena.lineWidth = 1;
 
 	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 50, row*gapHeight + 35, 15, 0, Math.PI*2);
+	gameArena.arc(column*gapWidth + (gapWidth/1.4), row*gapHeight + (gapHeight/2), ballRadius, 0, Math.PI*2);
 	gameArena.fillStyle = color;
 	gameArena.fill();
 	if(counterAnimate%2 == 0)
 		gameArena.strokeStyle = "black";
 	else
 		gameArena.strokeStyle = color;
-	gameArena.lineWidth = 3;
+	gameArena.lineWidth = ballBorderSize;
 	gameArena.stroke();
 	gameArena.closePath();
 	gameArena.lineWidth = 1;
