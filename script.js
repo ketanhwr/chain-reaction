@@ -1,5 +1,5 @@
-var horizontalCells = 6;
-var verticalCells = 9;
+var horizontalCells;
+var verticalCells;
 
 var width;
 var height;
@@ -20,17 +20,37 @@ var flag = false;
 
 var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
+var startButton = document.getElementById("startGameButton");
 var sound = document.getElementById("sound");
 var gameArena = canvas.getContext("2d");
+var horizontalCellsSlider = document.getElementById("horizontalCells");
+var verticalCellsSlider = document.getElementById("verticalCells");
+
+
 canvas.addEventListener("click", gameLoop);
 button.addEventListener("click", undoGame);
+startButton.addEventListener("click", startGame);
+horizontalCellsSlider.addEventListener("change", updateSliderVals);
+verticalCellsSlider.addEventListener("change", updateSliderVals);
 
-initialiseValues();
-initialiseMatrix();
-initialise();
+startGame();
+
+function startGame(){
+	horizontalCells = horizontalCellsSlider.value;
+	verticalCells = verticalCellsSlider.value;
+	initialiseValues();
+	initialiseMatrix();
+	initialise();
+}
+
+function updateSliderVals(){
+	$("#horizontalCellsVal").html(horizontalCellsSlider.value);
+	$("#verticalCellsVal").html(verticalCellsSlider.value);
+}
 
 function initialise()
 {
+	document.getElementById("undo").style.visibility = "visible";
 	isGameOver = false;
 	matrixDefault();
 	drawArena();
@@ -189,17 +209,6 @@ function gameLoop(event)
 	}
 }
 
-function checkGameOver()
-{
-	if(gameOver() == 1 || gameOver() == 2)
-	{
-		isGameOver = true;
-		gameOverScreen(gameOver());
-		clearInterval(gameTimer);
-		setTimeout(initialise, 4000);
-	}
-}
-
 function populateCornerCells(i, j){
 	countMatrix[i][j] -= 2;
 	countMatrix[ i == (verticalCells - 1) ? i-1 : i+1 ][j]++;
@@ -241,7 +250,12 @@ function updateMatrix()
 {
 	counterAnimate++;
 	drawArena();
-	var cornerCord = [[0,0], [(verticalCells - 1),0], [(verticalCells - 1),(horizontalCells - 1)], [0,(horizontalCells - 1)]];
+	var cornerCord = [
+        [0,0],
+        [(verticalCells - 1),0],
+        [(verticalCells - 1),(horizontalCells - 1)],
+        [0,(horizontalCells - 1)]
+    ];
 
 	while(notStable()){
 		for(var i = 0; i < 4;i++)
@@ -286,13 +300,13 @@ function checkGameOver()
 	if(gameOver() == 1 || gameOver() == 2)
 	{
 		isGameOver = true;
-		gameOverScreen(gameOver());
+		document.getElementById("undo").style.visibility = "hidden";
+		drawArena();
+		setTimeout(gameOverScreen.bind(null,gameOver()), 2000);
 		clearInterval(gameTimer);
-		setTimeout(initialise, 4000);
+		setTimeout(initialise, 6000);
 	}
 }
-
-
 
 function notStable()
 {
