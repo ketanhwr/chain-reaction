@@ -12,20 +12,46 @@ var undoColor = new Array(9);
 var isGameOver = false;
 var counterAnimate = 0;
 var flag = false;
-
+var orginalColors = ["red", "green", "blue", "orange", "yellow", "pink", "purple", "grey"];
+var colors = ["red", "green", "blue", "orange", "yellow", "pink", "purple", "grey"];
+var noOfPlayers = "null";
+var noOfPlayersOption = document.getElementById("noOfPlayers");
 var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
 var sound = document.getElementById("sound");
 var gameArena = canvas.getContext("2d");
 canvas.addEventListener("click", gameLoop);
 button.addEventListener("click", undoGame);
+noOfPlayersOption.addEventListener("change", selectNoOfPlayers)
 
-initialiseMatrix();
-initialise();
+// initialiseMatrix();
+// initialise();
+
+function selectNoOfPlayers()
+{
+	noOfPlayers = noOfPlayersOption.value;
+	if(noOfPlayers != "null")
+	{
+		noOfPlayers = parseInt(noOfPlayers)
+		initialiseMatrix();
+		initialise();
+	} else {
+		resetCanvas();
+	}
+}
+
+function resetCanvas()
+{
+	gameArena.clearRect(0, 0, width, height);
+	clearInterval(gameTimer);
+	colors = orginalColors;
+	document.getElementById("undo").style.visibility = "hidden";
+}
 
 function initialise()
 {
-	document.getElementById("undo").style.visibility = "visible";
+
+	document.getElementById("undo").style.visibility = noOfPlayers != "null" ? "visible" : "hidden";
 	isGameOver = false;
 	matrixDefault();
 	drawArena();
@@ -62,11 +88,10 @@ function matrixDefault()
 function drawArena()
 {
 	gameArena.clearRect(0, 0, width, height);
-	
-	if(turnCount % 2 == 0)
-		gameArena.strokeStyle = "red";
+	if(turnCount % noOfPlayers == 0)
+		gameArena.strokeStyle = colors[0];
 	else
-		gameArena.strokeStyle = "green";
+		gameArena.strokeStyle = colors[turnCount % noOfPlayers];
 
 	for(var counter = 1; counter < 6; counter++)
 	{
@@ -116,7 +141,7 @@ function undoGame()
 				colorMatrix[i][j] = undoColor[i][j];
 			}
 		}
-		
+
 	} else {
 		 $('.undoMessage').stop().fadeIn(400).delay(2000).fadeOut(400); //fade out after 2 seconds
 	}
@@ -147,17 +172,17 @@ function gameLoop(event)
 	if(!isGameOver)
 	{
 		takeBackUp();
-		if(turnCount%2 == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
+		if(turnCount%noOfPlayers == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == colors[0]))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "red";
+			colorMatrix[column][row] = colors[0];
 			turnCount++;
 			flag = false;
 		}
-		if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
+		if(turnCount%noOfPlayers >= 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == colors[turnCount%noOfPlayers]))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "green";
+			colorMatrix[column][row] = colors[turnCount%noOfPlayers];
 			turnCount++;
 			flag = false;
 		}
@@ -247,14 +272,14 @@ function updateMatrix()
 
 function checkGameOver()
 {
-	if(gameOver() == 1 || gameOver() == 2)
+	if(gameOver())
 	{
 		isGameOver = true;
 		document.getElementById("undo").style.visibility = "hidden";
 		drawArena();
-		setTimeout(gameOverScreen.bind(null,gameOver()), 2000);
+		setTimeout(gameOverScreen.bind(null,gameOver()), 1000);
 		clearInterval(gameTimer);
-		setTimeout(initialise, 6000);
+		setTimeout(resetCanvas, 5000);
 	}
 }
 
@@ -284,49 +309,50 @@ function notStable()
 
 function gameOver()
 {
-	var countRed = 0;
-	var countGreen = 0;
+	var colorCountObj={};
+	for(var k = 0;k < noOfPlayers; k++){
+		colorCountObj[colors[k]] = 0;
+	}
 	for(var i = 0; i < 9; i++)
 	{
 		for(var j = 0;j < 6; j++)
 		{
-			if(colorMatrix[i][j] == "red") countRed++;
-			if(colorMatrix[i][j] == "green") countGreen++;
+			for(var k = 0;k < noOfPlayers; k++){
+				if(colorMatrix[i][j] == colors[k]){
+					if(colorCountObj[colors[k]]){
+						colorCountObj[colors[k]] = colorCountObj[colors[k]] + 1;
+					}else{
+						colorCountObj[colors[k]] = 1;
+					}
+				}
+			}
 		}
 	}
-	if(turnCount > 1)
+	if(turnCount > noOfPlayers)
 	{
-		if(countRed == 0)
-		{
-			return 2;
+		var playersIn = 0;
+		for(var color in colorCountObj){
+			if(colorCountObj[color] !== 0){
+				playersIn++;
+			} else {
+				colors.splice(colors.indexOf(color), 1)
+			}
 		}
-		if(countGreen == 0)
-		{
-			return 1;
+		noOfPlayers = playersIn;
+		if(noOfPlayers == 1){
+			return orginalColors.indexOf(color)+1;
 		}
 	}
 }
 
 function gameOverScreen(player)
 {
-	if(player == 2)
-	{
-		gameArena.clearRect(0, 0, width, height);
-		gameArena.fillStyle = "black";
-		gameArena.fillRect(0, 0, width, height);
-		gameArena.fillStyle = "white";
-		gameArena.font = "40px Times New Roman";
-		gameArena.fillText("Player 2 wins!", width/2 - 150, height/2 - 50);
-	}
-	else
-	{
-		gameArena.clearRect(0, 0, width, height);
-		gameArena.fillStyle = "black";
-		gameArena.fillRect(0, 0, width, height);
-		gameArena.fillStyle = "white";
-		gameArena.font = "40px Times New Roman";
-		gameArena.fillText("Player 1 wins!", width/2 - 150, height/2 - 50);
-	}
+	gameArena.clearRect(0, 0, width, height);
+	gameArena.fillStyle = "black";
+	gameArena.fillRect(0, 0, width, height);
+	gameArena.fillStyle = "white";
+	gameArena.font = "40px Times New Roman";
+	gameArena.fillText("Player "+player+" wins!", width/2 - 150, height/2 - 50);
 }
 
 function oneCircle(row, column, color)
