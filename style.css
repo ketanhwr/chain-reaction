@@ -1,15 +1,38 @@
+html, body {
+	margin: 0;
+	padding: 0;
+}
+
 body
 {
 	background-color: black;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.container {
+	position: relative;
+	width: 100%;
+	text-align: center;
+	margin: 0 auto;
+}
+
+.turnIndicator {
+	visibility: hidden;
+	color: red;
+	margin-bottom: 5px;
 }
 
 canvas
 {
 	background-color: white;
+	display: block;
+	margin: 0 auto;
 }
 
 .undo
 {
+	margin: 0 auto;
 	background-color: white;
 	color: black;
 	font-size: 18px;
@@ -17,7 +40,7 @@ canvas
 	border-radius: 25px;
 	text-decoration: none;
 	height: 20px;
-	margin-bottom: 10px;
+	margin-bottom: 5px;
 	margin-top: -10px;
 	transition: background-color 0.8s, color 0.8s;
 	-webkit-transition: background-color 0.8s, color 0.8s;
@@ -38,7 +61,7 @@ canvas
     height:auto;
     position:absolute;
     left:50%;
-    margin-left:-100px;
+    margin-left:-110px;
     bottom:10px;
     background-color: #383838;
     color: #F0F0F0;

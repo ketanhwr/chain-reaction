@@ -6,9 +6,12 @@
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 	</head>
 	<body>
-		<center>
+		<div class="container">
 			<div class="undo" id="undo">
 				<p>UNDO</p>
+			</div>
+			<div class="turnIndicator" id="turnIndicator">
+				Player 1 turn
 			</div>
 			<canvas width="420" height="630" id="arena">
 				Canvas tag not supported!
@@ -16,11 +19,9 @@
 			<audio src="point_sound.mp3" id="sound">
 				Audio tag not supported!
 			</audio>
-			<center>
-				<a href="https://brilliant.org/wiki/chain-reaction-game/" target="_blank">Rules</a>
-			</center>
+			<a href="https://brilliant.org/wiki/chain-reaction-game/" target="_blank">Rules</a>
 			<script src="script.js"></script>
-		</center>
-		<div class='undoMessage' style='display:none' id ='undoError' >Only one move can be Undone!</div>
+			<div class='undoMessage' style='display:none' id ='undoError' >Only one move can be Undone!</div>
+		</div>
 	</body>
 </html>

@@ -17,6 +17,7 @@ var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
 var sound = document.getElementById("sound");
 var gameArena = canvas.getContext("2d");
+var turnIndicator = document.getElementById("turnIndicator");
 canvas.addEventListener("click", gameLoop);
 button.addEventListener("click", undoGame);
 
@@ -26,6 +27,7 @@ initialise();
 function initialise()
 {
 	document.getElementById("undo").style.visibility = "visible";
+	turnIndicator.style.visibility = "visible";
 	isGameOver = false;
 	matrixDefault();
 	drawArena();
@@ -64,9 +66,9 @@ function drawArena()
 	gameArena.clearRect(0, 0, width, height);
 	
 	if(turnCount % 2 == 0)
-		gameArena.strokeStyle = "red";
+		gameArena.strokeStyle = "red", turnIndicator.style.color = "red", turnIndicator.innerHTML = "Player 1 turn";
 	else
-		gameArena.strokeStyle = "green";
+		gameArena.strokeStyle = "green", turnIndicator.style.color = "green", turnIndicator.innerHTML = "Player 2 turn";
 
 	for(var counter = 1; counter < 6; counter++)
 	{
@@ -251,6 +253,7 @@ function checkGameOver()
 	{
 		isGameOver = true;
 		document.getElementById("undo").style.visibility = "hidden";
+		turnIndicator.style.visibility = "hidden";
 		drawArena();
 		setTimeout(gameOverScreen.bind(null,gameOver()), 2000);
 		clearInterval(gameTimer);
