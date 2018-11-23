@@ -12,17 +12,26 @@ var undoColor = new Array(9);
 var isGameOver = false;
 var counterAnimate = 0;
 var flag = false;
-
+let presentPlayer = 1;
+var players = ["red", "green", "yellow", "orange", "blue", "purple", "pink"];
 var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
 var sound = document.getElementById("sound");
 var gameArena = canvas.getContext("2d");
+var modalBox = document.getElementById("number-of-players-box");
 var turnIndicator = document.getElementById("turnIndicator");
+var startButton = document.getElementById("gameStarter");
+var numberOfPlayers = 2;
+startButton.addEventListener("click", startGame);
 canvas.addEventListener("click", gameLoop);
 button.addEventListener("click", undoGame);
 
-initialiseMatrix();
-initialise();
+function startGame() {
+	numberOfPlayers = document.getElementById("playerInput").value;
+	modalBox.style.display = "none";
+	initialiseMatrix();
+	initialise();
+}
 
 function initialise()
 {
@@ -61,14 +70,17 @@ function matrixDefault()
 	}
 }
 
+
+
 function drawArena()
 {
 	gameArena.clearRect(0, 0, width, height);
-	
-	if(turnCount % 2 == 0)
-		gameArena.strokeStyle = "red", turnIndicator.style.color = "red", turnIndicator.innerHTML = "Player 1 turn";
-	else
-		gameArena.strokeStyle = "green", turnIndicator.style.color = "green", turnIndicator.innerHTML = "Player 2 turn";
+
+
+	// if(turnCount % numberOfPlayers == 0)
+	gameArena.strokeStyle = players[presentPlayer-1], turnIndicator.style.color = players[presentPlayer-1], turnIndicator.innerHTML = `Player ${presentPlayer} turn`;
+	// else
+		// gameArena.strokeStyle = "green", turnIndicator.style.color = "green", turnIndicator.innerHTML = "Player 2 turn";
 
 	for(var counter = 1; counter < 6; counter++)
 	{
@@ -118,7 +130,7 @@ function undoGame()
 				colorMatrix[i][j] = undoColor[i][j];
 			}
 		}
-		
+
 	} else {
 		 $('.undoMessage').stop().fadeIn(400).delay(2000).fadeOut(400); //fade out after 2 seconds
 	}
@@ -149,20 +161,25 @@ function gameLoop(event)
 	if(!isGameOver)
 	{
 		takeBackUp();
-		if(turnCount%2 == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
+		if(/*turnCount%2 == 0 &&*/ (colorMatrix[column][row] == "" || colorMatrix[column][row] == `${players[presentPlayer-1]}`))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "red";
+			colorMatrix[column][row] = `${players[presentPlayer-1]}`;
 			turnCount++;
+			if (presentPlayer == numberOfPlayers) {
+				presentPlayer = 1;
+			} else {
+			presentPlayer++;
+		}
 			flag = false;
 		}
-		if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
-		{
-			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "green";
-			turnCount++;
-			flag = false;
-		}
+		// if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
+		// {
+		// 	countMatrix[column][row]++;		//Weird graphic coordinate-system
+		// 	colorMatrix[column][row] = "green";
+		// 	turnCount++;
+		// 	flag = false;
+		// }
 	}
 }
 
@@ -207,6 +224,8 @@ function updateMatrix()
 {
 	counterAnimate++;
 	drawArena();
+
+
 	var cornerCord = [[0,0], [8,0], [8,5], [0,5]];
 
 	while(notStable()){
@@ -249,7 +268,7 @@ function updateMatrix()
 
 function checkGameOver()
 {
-	if(gameOver() == 1 || gameOver() == 2)
+	if(gameOver() > 0)
 	{
 		isGameOver = true;
 		document.getElementById("undo").style.visibility = "hidden";
@@ -284,53 +303,108 @@ function notStable()
 
 	return ans;
 }
-
+//var players = ["red", "green", "yellow", "orange", "blue", "purple", "pink"];
+//TODO: alter this function
+let colorArray;
+let possibleWinner;
 function gameOver()
 {
+	colorArray = [];
+
 	var countRed = 0;
 	var countGreen = 0;
+	var countYellow = 0;
+	var countOrange = 0;
+	var countBlue = 0;
+	var countPurple = 0;
+	var countPink = 0;
 	for(var i = 0; i < 9; i++)
 	{
 		for(var j = 0;j < 6; j++)
 		{
-			if(colorMatrix[i][j] == "red") countRed++;
-			if(colorMatrix[i][j] == "green") countGreen++;
+			colorArray.push(colorMatrix[i][j]);
+			possibleWinner = colorArray.find(item => item !== "")
+			if (colorArray.every(x => x = possibleWinner||"")) {
+			switch (possibleWinner) {
+				case "red":
+				 countRed++;
+				 break;
+				case "green":
+				 countGreen++;
+				 break;
+				case "yellow":
+				 countYellow++;
+				 break;
+				case "orange":
+					countOrange++;
+					break;
+				case "blue":
+					countBlue++;
+					break;
+				case "purple":
+					countPurple++;
+					break;
+				case "pink":
+					countPink++;
+
+		}
+	}
 		}
 	}
 	if(turnCount > 1)
 	{
-		if(countRed == 0)
+		if(countRed == 1)
+		{
+			return 1;
+		}
+		if(countGreen == 1)
 		{
 			return 2;
 		}
-		if(countGreen == 0)
+		if(countYellow == 1)
 		{
-			return 1;
+			return 3;
+		}
+		if(countOrange == 1)
+		{
+			return 4;
+		}
+		if(countBlue == 1)
+		{
+			return 5;
+		}
+		if(countPurple == 1)
+		{
+			return 6;
+		}
+		if(countPink == 1)
+		{
+			return 7;
 		}
 	}
 }
 
 function gameOverScreen(player)
 {
-	if(player == 2)
-	{
+
+
 		gameArena.clearRect(0, 0, width, height);
 		gameArena.fillStyle = "black";
 		gameArena.fillRect(0, 0, width, height);
 		gameArena.fillStyle = "white";
 		gameArena.font = "40px Times New Roman";
-		gameArena.fillText("Player 2 wins!", width/2 - 150, height/2 - 50);
+		gameArena.fillText(`Player ${player} wins!`, width/2 - 150, height/2 - 50);
 	}
-	else
-	{
-		gameArena.clearRect(0, 0, width, height);
-		gameArena.fillStyle = "black";
-		gameArena.fillRect(0, 0, width, height);
-		gameArena.fillStyle = "white";
-		gameArena.font = "40px Times New Roman";
-		gameArena.fillText("Player 1 wins!", width/2 - 150, height/2 - 50);
-	}
-}
+// 	else
+// 	{
+// 		gameArena.clearRect(0, 0, width, height);
+// 		gameArena.fillStyle = "black";
+// 		gameArena.fillRect(0, 0, width, height);
+// 		gameArena.fillStyle = "white";
+// 		gameArena.font = "40px Times New Roman";
+// 		gameArena.fillText("Player 1 wins!", width/2 - 150, height/2 - 50);
+// 	}
+// }
 
 function oneCircle(row, column, color)
 {
