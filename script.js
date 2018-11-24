@@ -13,7 +13,7 @@ var isGameOver = false;
 var counterAnimate = 0;
 var flag = false;
 let presentPlayer = 1;
-var players = ["red", "green", "yellow", "orange", "blue", "purple", "pink"];
+var players = ["red", "green", "yellow", "orange", "blue", "purple", "pink", "cyan"];
 var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
 var sound = document.getElementById("sound");
@@ -22,13 +22,20 @@ var modalBox = document.getElementById("number-of-players-box");
 var turnIndicator = document.getElementById("turnIndicator");
 var startButton = document.getElementById("gameStarter");
 var numberOfPlayers = 2;
+let colorArray;
 startButton.addEventListener("click", startGame);
 canvas.addEventListener("click", gameLoop);
 button.addEventListener("click", undoGame);
 
+function newGame () {
+	modalBox.style.display = "block";
+
+}
+
 function startGame() {
 	numberOfPlayers = document.getElementById("playerInput").value;
 	modalBox.style.display = "none";
+	presentPlayer = 1;
 	initialiseMatrix();
 	initialise();
 }
@@ -276,7 +283,7 @@ function checkGameOver()
 		drawArena();
 		setTimeout(gameOverScreen.bind(null,gameOver()), 2000);
 		clearInterval(gameTimer);
-		setTimeout(initialise, 6000);
+		// gameOverScreen(gameOver())
 	}
 }
 
@@ -303,86 +310,53 @@ function notStable()
 
 	return ans;
 }
-//var players = ["red", "green", "yellow", "orange", "blue", "purple", "pink"];
+//var players = ["red", "green", "yellow", "orange", "blue", "purple", "pink", "cyan"];
 //TODO: alter this function
-let colorArray;
-let possibleWinner;
-function gameOver()
-{
+
+function gameOver() {
 	colorArray = [];
 
-	var countRed = 0;
-	var countGreen = 0;
-	var countYellow = 0;
-	var countOrange = 0;
-	var countBlue = 0;
-	var countPurple = 0;
-	var countPink = 0;
 	for(var i = 0; i < 9; i++)
 	{
 		for(var j = 0;j < 6; j++)
 		{
-			colorArray.push(colorMatrix[i][j]);
-			possibleWinner = colorArray.find(item => item !== "")
-			if (colorArray.every(x => x = possibleWinner||"")) {
-			switch (possibleWinner) {
-				case "red":
-				 countRed++;
-				 break;
-				case "green":
-				 countGreen++;
-				 break;
-				case "yellow":
-				 countYellow++;
-				 break;
-				case "orange":
-					countOrange++;
-					break;
-				case "blue":
-					countBlue++;
-					break;
-				case "purple":
-					countPurple++;
-					break;
-				case "pink":
-					countPink++;
+			colorArray.push(colorMatrix[i][j])
+		}}
 
+			if (turnCount>2){
+				colorArray = colorArray.filter(x => x!== "")
+				if  (colorArray.every(x => x == colorArray[0])) {
+					switch (colorArray[0]) {
+						case "red":
+				 		return 1;
+				 		break;
+						case "green":
+				 		return 2;
+				 		break;
+						case "yellow":
+				 		return 3;
+				 		break;
+						case "orange":
+						return 4;
+						break;
+						case "blue":
+						return 5;
+						break;
+						case "purple":
+						return 6;
+						break;
+						case "pink":
+						return 7;
+						break;
+						case "cyan":
+						return 8;
+				}
+			} else {
+				return 0;
+			}
 		}
-	}
-		}
-	}
-	if(turnCount > 1)
-	{
-		if(countRed == 1)
-		{
-			return 1;
-		}
-		if(countGreen == 1)
-		{
-			return 2;
-		}
-		if(countYellow == 1)
-		{
-			return 3;
-		}
-		if(countOrange == 1)
-		{
-			return 4;
-		}
-		if(countBlue == 1)
-		{
-			return 5;
-		}
-		if(countPurple == 1)
-		{
-			return 6;
-		}
-		if(countPink == 1)
-		{
-			return 7;
-		}
-	}
 }
+
 
 function gameOverScreen(player)
 {
@@ -394,6 +368,7 @@ function gameOverScreen(player)
 		gameArena.fillStyle = "white";
 		gameArena.font = "40px Times New Roman";
 		gameArena.fillText(`Player ${player} wins!`, width/2 - 150, height/2 - 50);
+		setTimeout(newGame(), 9000);
 	}
 // 	else
 // 	{
