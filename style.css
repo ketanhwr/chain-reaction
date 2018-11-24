@@ -23,6 +23,33 @@ body
 	margin-bottom: 5px;
 }
 
+#number-of-players-box {
+	display: block;
+	z-index: 1;
+	padding-top: 200px;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+
+#player-box-content {
+	background-color: #8e8e8e;
+	margin: auto;
+	border: 1px solid #fefefe;
+	width: 40%;
+}
+
+#player-box-text {
+
+}
+
+#playerInput {
+	width: 25px;
+	margin-bottom: 10px;
+}
+
 canvas
 {
 	background-color: white;
