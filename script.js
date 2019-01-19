@@ -20,7 +20,11 @@ var gameArena = canvas.getContext("2d");
 var turnIndicator = document.getElementById("turnIndicator");
 canvas.addEventListener("click", gameLoop);
 button.addEventListener("click", undoGame);
-
+var nump = prompt("no. of palyers?");
+while(nump>5){
+	alert("max palyers limit exceeded");
+	nump = prompt("no. of palyers?");
+}
 initialiseMatrix();
 initialise();
 
@@ -65,10 +69,16 @@ function drawArena()
 {
 	gameArena.clearRect(0, 0, width, height);
 	
-	if(turnCount % 2 == 0)
+	if(turnCount % nump == 0)
 		gameArena.strokeStyle = "red", turnIndicator.style.color = "red", turnIndicator.innerHTML = "Player 1 turn";
+	else if(turnCount % nump == 1)
+		gameArena.strokeStyle = "blue", turnIndicator.style.color = "blue", turnIndicator.innerHTML = "Player 2 turn";
+	else if(turnCount % nump == 2)
+		gameArena.strokeStyle = "yellow", turnIndicator.style.color = "yellow", turnIndicator.innerHTML = "Player 3 turn";
+	else if(turnCount % nump == 3)
+		gameArena.strokeStyle = "pink", turnIndicator.style.color = "pink", turnIndicator.innerHTML = "Player 4 turn";
 	else
-		gameArena.strokeStyle = "green", turnIndicator.style.color = "green", turnIndicator.innerHTML = "Player 2 turn";
+		gameArena.strokeStyle = "green", turnIndicator.style.color = "green", turnIndicator.innerHTML = "Player 5 turn";
 
 	for(var counter = 1; counter < 6; counter++)
 	{
@@ -149,14 +159,35 @@ function gameLoop(event)
 	if(!isGameOver)
 	{
 		takeBackUp();
-		if(turnCount%2 == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
+		if(turnCount%nump == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
 			colorMatrix[column][row] = "red";
 			turnCount++;
 			flag = false;
 		}
-		if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
+        if(turnCount%nump == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "blue"))
+		{
+			countMatrix[column][row]++;		//Weird graphic coordinate-system
+			colorMatrix[column][row] = "blue";
+			turnCount++;
+			flag = false;
+		}
+		if(turnCount%nump == 2 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "yellow"))
+		{
+			countMatrix[column][row]++;		//Weird graphic coordinate-system
+			colorMatrix[column][row] = "yellow";
+			turnCount++;
+			flag = false;
+		}
+		if(turnCount%nump == 3 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "pink"))
+		{
+			countMatrix[column][row]++;		//Weird graphic coordinate-system
+			colorMatrix[column][row] = "pink";
+			turnCount++;
+			flag = false;
+		}
+		if(turnCount%nump == 4 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
 			colorMatrix[column][row] = "green";
@@ -289,23 +320,43 @@ function gameOver()
 {
 	var countRed = 0;
 	var countGreen = 0;
+    var countYellow = 0;
+    var countBlue = 0;
+    var countPink = 0;
+    var totalcount=0;
 	for(var i = 0; i < 9; i++)
 	{
 		for(var j = 0;j < 6; j++)
 		{
 			if(colorMatrix[i][j] == "red") countRed++;
+			if(colorMatrix[i][j] == "blue") countBlue++;
+			if(colorMatrix[i][j] == "yellow") countYellow++;
+			if(colorMatrix[i][j] == "pink") countPink++;
 			if(colorMatrix[i][j] == "green") countGreen++;
+            totalcount++;
 		}
 	}
 	if(turnCount > 1)
 	{
-		if(countRed == 0)
+		if(countRed == totalcount)
+		{
+			return 1;
+		}
+		if(countBlue == totalcount)
 		{
 			return 2;
 		}
-		if(countGreen == 0)
+		if(countYellow == totalcount)
 		{
-			return 1;
+			return 3;
+		}
+		if(countPink == totalcount)
+		{
+			return 4;
+		}
+		if(countGreen == totalcount)
+		{
+			return 5;
 		}
 	}
 }
