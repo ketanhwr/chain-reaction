@@ -565,7 +565,7 @@ function threeCircle(row, column, color)
         strokeColor = color;
 
 	if(counterAnimate%2 == 0)
-		gameArena.strokeStyle = "black";
+		strokeColor = "black";
 
     drawCircleAtHelper(gameArena, x, y, 15, color, 3, strokeColor);
 
