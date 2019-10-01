@@ -12,6 +12,7 @@ var undoColor = new Array(9);
 var isGameOver = false;
 var counterAnimate = 0;
 var flag = false;
+var animatingObjects = [];
 
 var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
@@ -64,7 +65,7 @@ function matrixDefault()
 function drawArena()
 {
 	gameArena.clearRect(0, 0, width, height);
-	
+
 	if(turnCount % 2 == 0)
 		gameArena.strokeStyle = "red", turnIndicator.style.color = "red", turnIndicator.innerHTML = "Player 1 turn";
 	else
@@ -102,6 +103,11 @@ function drawArena()
 				threeCircle(i, j, colorMatrix[i][j]);
 		}
 	}
+
+    for(var i=0; i<animatingObjects.length; i++) {
+        var config = animatingObjects[i];
+        drawCircleAtHelper(gameArena, config.x, config.y, 15, config.color, 3, config.color);
+    }
 }
 
 function undoGame()
@@ -118,7 +124,7 @@ function undoGame()
 				colorMatrix[i][j] = undoColor[i][j];
 			}
 		}
-		
+
 	} else {
 		 $('.undoMessage').stop().fadeIn(400).delay(2000).fadeOut(400); //fade out after 2 seconds
 	}
@@ -166,41 +172,223 @@ function gameLoop(event)
 	}
 }
 
+function blastAnimate (duration, afterAnimation)
+{
+    var start = null,
+        xSpeeds = [],
+        ySpeeds = [],
+        config = null;
+    for (var i=0; i<animatingObjects.length; i++)
+    {
+        config = animatingObjects[i];
+        xSpeeds[i] = (config.toX - config.fromX) / duration;
+        ySpeeds[i] = (config.toY - config.fromY) / duration;
+    }
+
+    function step (timestamp)
+    {
+        if (!start) start = timestamp;
+        var config = null,
+            ellapsed = timestamp - start,
+            timeRemaining = duration - ellapsed;
+        if (timeRemaining <= 0)
+            timeRemaining = 0;
+
+        for (var i=0; i<animatingObjects.length; i++) {
+            config = animatingObjects[i];
+            config.x = config.toX - timeRemaining * xSpeeds[i];
+            config.y = config.toY - timeRemaining * ySpeeds[i];
+        }
+
+        drawArena();
+        if (timeRemaining > 0) requestAnimationFrame(step);
+        else
+        {
+            animatingObjects = [];
+            if (typeof afterAnimation === 'function') afterAnimation();
+        }
+    }
+
+    requestAnimationFrame(step);
+}
+
 function populateCornerCells(i, j){
-	countMatrix[i][j] -= 2;
-	countMatrix[ i == 8 ? i-1 : i+1 ][j]++;
-	countMatrix[i][ j==5 ? j-1 : j+1 ]++;
-	colorMatrix[ i == 8 ? i-1 : i+1 ][j] = colorMatrix[i][j];
-	colorMatrix[i][ j==5 ? j-1 : j+1 ] = colorMatrix[i][j];
-	if(countMatrix[i][j] == 0)
-		colorMatrix[i][j] = "";
+    countMatrix[i][j] -= 2;
+    drawArena();
+    var config1 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: (j === 5 ? j-1 : j+1)*gapWidth + 35,
+        toY: i*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+    var config2 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: j*gapWidth + 35,
+        toY: (i === 8 ? i-1 : i+1)*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+
+    animatingObjects.push(config1);
+    animatingObjects.push(config2);
+
+    function afterAnimation () {
+        countMatrix[ i == 8 ? i-1 : i+1 ][j]++;
+        countMatrix[i][ j==5 ? j-1 : j+1 ]++;
+        colorMatrix[ i == 8 ? i-1 : i+1 ][j] = colorMatrix[i][j];
+        colorMatrix[i][ j==5 ? j-1 : j+1 ] = colorMatrix[i][j];
+        if(countMatrix[i][j] == 0)
+            colorMatrix[i][j] = "";
+        drawArena();
+    }
+    blastAnimate(gameSpeed-60, afterAnimation);
 	sound.play();
 }
 
 function populateSideHCells(i, j){  // H = Height
 	countMatrix[i][j] -= 3;
-	countMatrix[i-1][j]++;
-	countMatrix[i+1][j]++;
-	countMatrix[i][ j==0 ? j+1 : j-1 ]++;
-	colorMatrix[i][ j==0 ? j+1 : j-1 ] = colorMatrix[i][j];
-	colorMatrix[i-1][j] = colorMatrix[i][j];
-	colorMatrix[i+1][j] = colorMatrix[i][j];
-	if(countMatrix[i][j] == 0)
-		colorMatrix[i][j] = "";
+    drawArena();
+    var config1 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: j*gapWidth + 35,
+        toY: (i-1)*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+    var config2 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: j*gapWidth + 35,
+        toY: (i+1)*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+    var config3 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: (j === 0 ? j+1 : j-1)*gapWidth + 35,
+        toY: i*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+
+    animatingObjects.push(config1);
+    animatingObjects.push(config2);
+    animatingObjects.push(config3);
+
+    function afterAnimation () {
+        countMatrix[i-1][j]++;
+        countMatrix[i+1][j]++;
+        countMatrix[i][ j==0 ? j+1 : j-1 ]++;
+        colorMatrix[i][ j==0 ? j+1 : j-1 ] = colorMatrix[i][j];
+        colorMatrix[i-1][j] = colorMatrix[i][j];
+        colorMatrix[i+1][j] = colorMatrix[i][j];
+        if(countMatrix[i][j] == 0)
+            colorMatrix[i][j] = "";
+        drawArena();
+    }
+
+    blastAnimate(gameSpeed-60, afterAnimation);
 	sound.play();
 }
 
 function populateSideWCells(i, j) {  // W = Width
 	countMatrix[i][j] -= 3;
-	countMatrix[ i==0 ? i+1 : i-1 ][j]++;
-	countMatrix[i][j-1]++;
-	countMatrix[i][j+1]++;
-	colorMatrix[ i==0 ? i+1 : i-1 ][j] = colorMatrix[i][j];
-	colorMatrix[i][j-1] = colorMatrix[i][j];
-	colorMatrix[i][j+1] = colorMatrix[i][j];
-	if(countMatrix[i][j] == 0)
-		colorMatrix[i][j] = "";
+    drawArena();
+
+    var config1 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: (j-1)*gapWidth + 35,
+        toY: i*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+    var config2 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: (j+1)*gapWidth + 35,
+        toY: i*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+    var config3 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: j*gapWidth + 35,
+        toY: (i===0 ? i+1 : i-1)*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+
+    animatingObjects.push(config1);
+    animatingObjects.push(config2);
+    animatingObjects.push(config3);
+
+    function afterAnimation () {
+        countMatrix[ i==0 ? i+1 : i-1 ][j]++;
+        countMatrix[i][j-1]++;
+        countMatrix[i][j+1]++;
+        colorMatrix[ i==0 ? i+1 : i-1 ][j] = colorMatrix[i][j];
+        colorMatrix[i][j-1] = colorMatrix[i][j];
+        colorMatrix[i][j+1] = colorMatrix[i][j];
+        if(countMatrix[i][j] == 0)
+            colorMatrix[i][j] = "";
+        drawArena();
+    }
+    blastAnimate(gameSpeed-60, afterAnimation);
 	sound.play();
+}
+
+function populateInnerCells (i, j) {
+    countMatrix[i][j] -= 4;
+    drawArena();
+
+    var config1 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: (j-1)*gapWidth + 35,
+        toY: i*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+    var config2 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: (j+1)*gapWidth + 35,
+        toY: i*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+    var config3 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: j*gapWidth + 35,
+        toY: (i-1)*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+    var config4 = {
+        fromX: j*gapWidth + 35,
+        fromY: i*gapHeight + 35,
+        toX: j*gapWidth + 35,
+        toY: (i+1)*gapHeight + 35,
+        color: colorMatrix[i][j],
+    };
+
+    animatingObjects.push(config1);
+    animatingObjects.push(config2);
+    animatingObjects.push(config3);
+    animatingObjects.push(config4);
+
+    function afterAnimation () {
+        countMatrix[i-1][j]++;
+        countMatrix[i+1][j]++;
+        countMatrix[i][j-1]++;
+        countMatrix[i][j+1]++;
+        colorMatrix[i-1][j] = colorMatrix[i][j];
+        colorMatrix[i+1][j] = colorMatrix[i][j];
+        colorMatrix[i][j-1] = colorMatrix[i][j];
+        colorMatrix[i][j+1] = colorMatrix[i][j];
+        if(countMatrix[i][j] == 0)
+            colorMatrix[i][j] = "";
+        drawArena();
+    }
+    blastAnimate(gameSpeed-60, afterAnimation);
+    sound.play();
 }
 
 function updateMatrix()
@@ -225,21 +413,7 @@ function updateMatrix()
 
 		for(var i = 1; i < 8; i++){
 			for(var j = 1; j < 5; j++){
-				if(countMatrix[i][j] >= 4){
-					countMatrix[i][j] -= 4;
-					countMatrix[i-1][j]++;
-					countMatrix[i+1][j]++;
-					countMatrix[i][j-1]++;
-					countMatrix[i][j+1]++;
-					colorMatrix[i-1][j] = colorMatrix[i][j];
-					colorMatrix[i+1][j] = colorMatrix[i][j];
-					colorMatrix[i][j-1] = colorMatrix[i][j];
-					colorMatrix[i][j+1] = colorMatrix[i][j];
-					if(countMatrix[i][j] == 0)
-						colorMatrix[i][j] = "";
-					sound.play();
-					break;
-				}
+				if(countMatrix[i][j] >= 4){ populateInnerCells(i, j); break; }
 			}
 		}
 		break;
@@ -260,8 +434,6 @@ function checkGameOver()
 		setTimeout(initialise, 6000);
 	}
 }
-
-
 
 function notStable()
 {
@@ -332,110 +504,75 @@ function gameOverScreen(player)
 	}
 }
 
+function drawCircleAtHelper (ctx, x, y, radius, fillColor, strokeWidth, strokeColor)
+{
+    var oldStrokeWidth = ctx.lineWidth;
+
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI*2);
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = strokeWidth;
+    ctx.stroke();
+    ctx.closePath();
+    ctx.lineWidth = oldStrokeWidth;
+}
+
 function oneCircle(row, column, color)
 {
-	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 35, row*gapHeight + 35, 15, 0, Math.PI*2);
-	gameArena.fillStyle = color;
-	gameArena.fill();
+    var x = column*gapWidth + 35,
+        y = row*gapHeight + 35,
+        strokeColor = color;
+
 	if((row == 0 && column == 0) || (row == 8 && column == 0) || (row == 0 && column == 5) || (row == 8 && column == 5))
 	{
 		if(counterAnimate%2 == 0)
-			gameArena.strokeStyle = "black";
-		else
-			gameArena.strokeStyle = color;
+			strokeColor = "black";
 	}
 	else
 	{
-		gameArena.strokeStyle = "black";
+		strokeColor = "black";
 	}
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
+    drawCircleAtHelper(gameArena, x, y, 15, color, 3, strokeColor);
 }
 
 function twoCircle(row, column, color)
 {
-	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 20, row*gapHeight + 35, 15, 0, Math.PI*2);
-	gameArena.fillStyle = color;
-	gameArena.fill();
-	if(((row >= 1 && row < 8) && (column == 0 || column == 5)) || ((row == 0 || row == 8) && (column >= 1 && column < 5)))
-	{
-		if(counterAnimate%2 == 0)
-			gameArena.strokeStyle = "black";
-		else
-			gameArena.strokeStyle = color;
-	}
-	else
-	{
-		gameArena.strokeStyle = "black";
-	}
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
+    var x = column*gapWidth + 20,
+        y = row*gapHeight + 35,
+        strokeColor = color;
 
-	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 50, row*gapHeight + 35, 15, 0, Math.PI*2);
-	gameArena.fillStyle = color;
-	gameArena.fill();
 	if(((row >= 1 && row < 8) && (column == 0 || column == 5)) || ((row == 0 || row == 8) && (column >= 1 && column < 5)))
 	{
 		if(counterAnimate%2 == 0)
-			gameArena.strokeStyle = "black";
-		else
-			gameArena.strokeStyle = color;
+			strokeColor = "black";
 	}
 	else
 	{
-		gameArena.strokeStyle = "black";
+		strokeColor = "black";
 	}
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
+    drawCircleAtHelper(gameArena, x, y, 15, color, 3, strokeColor);
+
+    x = column*gapWidth + 50;;
+    drawCircleAtHelper(gameArena, x, y, 15, color, 3, strokeColor);
 }
 
 function threeCircle(row, column, color)
 {
-	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 20, row*gapHeight + 17, 15, 0, Math.PI*2);
-	gameArena.fillStyle = color;
-	gameArena.fill();
-	if(counterAnimate%2 == 0)
-		gameArena.strokeStyle = "black";
-	else
-		gameArena.strokeStyle = color;
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
+    var x = column*gapWidth + 20,
+        y = row*gapHeight + 17,
+        strokeColor = color;
 
-	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 20, row*gapHeight + 53, 15, 0, Math.PI*2);
-	gameArena.fillStyle = color;
-	gameArena.fill();
 	if(counterAnimate%2 == 0)
 		gameArena.strokeStyle = "black";
-	else
-		gameArena.strokeStyle = color;
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
 
-	gameArena.beginPath();
-	gameArena.arc(column*gapWidth + 50, row*gapHeight + 35, 15, 0, Math.PI*2);
-	gameArena.fillStyle = color;
-	gameArena.fill();
-	if(counterAnimate%2 == 0)
-		gameArena.strokeStyle = "black";
-	else
-		gameArena.strokeStyle = color;
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
+    drawCircleAtHelper(gameArena, x, y, 15, color, 3, strokeColor);
+
+    y = row*gapHeight + 53;
+    drawCircleAtHelper(gameArena, x, y, 15, color, 3, strokeColor);
+
+    x = column*gapWidth + 50;
+    y = row*gapHeight + 35;;
+    drawCircleAtHelper(gameArena, x, y, 15, color, 3, strokeColor);
 }
