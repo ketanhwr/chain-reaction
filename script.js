@@ -261,7 +261,12 @@ function checkGameOver()
 	}
 }
 
-
+function updateGameArena() {
+    gameArena.lineWidth = 3;
+    gameArena.stroke();
+    gameArena.closePath();
+    gameArena.lineWidth = 1;
+}
 
 function notStable()
 {
@@ -349,10 +354,7 @@ function oneCircle(row, column, color)
 	{
 		gameArena.strokeStyle = "black";
 	}
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
+	updateGameArena();
 }
 
 function twoCircle(row, column, color)
@@ -372,10 +374,7 @@ function twoCircle(row, column, color)
 	{
 		gameArena.strokeStyle = "black";
 	}
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
+	updateGameArena();
 
 	gameArena.beginPath();
 	gameArena.arc(column*gapWidth + 50, row*gapHeight + 35, 15, 0, Math.PI*2);
@@ -392,10 +391,7 @@ function twoCircle(row, column, color)
 	{
 		gameArena.strokeStyle = "black";
 	}
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
+	updateGameArena();
 }
 
 function threeCircle(row, column, color)
@@ -408,10 +404,7 @@ function threeCircle(row, column, color)
 		gameArena.strokeStyle = "black";
 	else
 		gameArena.strokeStyle = color;
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
+	updateGameArena();
 
 	gameArena.beginPath();
 	gameArena.arc(column*gapWidth + 20, row*gapHeight + 53, 15, 0, Math.PI*2);
@@ -421,10 +414,7 @@ function threeCircle(row, column, color)
 		gameArena.strokeStyle = "black";
 	else
 		gameArena.strokeStyle = color;
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
+	updateGameArena();
 
 	gameArena.beginPath();
 	gameArena.arc(column*gapWidth + 50, row*gapHeight + 35, 15, 0, Math.PI*2);
@@ -434,8 +424,5 @@ function threeCircle(row, column, color)
 		gameArena.strokeStyle = "black";
 	else
 		gameArena.strokeStyle = color;
-	gameArena.lineWidth = 3;
-	gameArena.stroke();
-	gameArena.closePath();
-	gameArena.lineWidth = 1;
+	updateGameArena();
 }
