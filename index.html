@@ -5,7 +5,7 @@
 		<title>Chain Reaction!</title>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 	</head>
-	<body>
+	<body id="body">
 		<div class="container">
 			<div class="undo" id="undo">
 				<p>UNDO</p>
@@ -19,7 +19,15 @@
 			<audio src="point_sound.mp3" id="sound">
 				Audio tag not supported!
 			</audio>
-			<a href="https://brilliant.org/wiki/chain-reaction-game/" target="_blank">Rules</a>
+			<div class="whiteButton">
+				<a href="https://brilliant.org/wiki/chain-reaction-game/" target="_blank">Rules</a>
+			</div>
+			<div>
+				<button onClick="standardMode()" class="whiteButton">Standard</button>
+				<button onclick="pastelMode()" class="whiteButton">Pastel</button>
+				<button onclick="partyMode()" class="whiteButton">Party</button>
+				<button onclick="autumnMode()" class="whiteButton">Autumn</button>
+			</div>
 			<script src="script.js"></script>
 			<div class='undoMessage' style='display:none' id ='undoError' >Only one move can be Undone!</div>
 		</div>
