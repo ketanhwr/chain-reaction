@@ -13,6 +13,10 @@ var isGameOver = false;
 var counterAnimate = 0;
 var flag = false;
 
+//for themes
+window.redColor = "red";
+window.greenColor = "green";
+
 var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
 var sound = document.getElementById("sound");
@@ -66,9 +70,9 @@ function drawArena()
 	gameArena.clearRect(0, 0, width, height);
 	
 	if(turnCount % 2 == 0)
-		gameArena.strokeStyle = "red", turnIndicator.style.color = "red", turnIndicator.innerHTML = "Player 1 turn";
+		gameArena.strokeStyle = window.redColor, turnIndicator.style.color = window.redColor, turnIndicator.innerHTML = "Player 1 turn";
 	else
-		gameArena.strokeStyle = "green", turnIndicator.style.color = "green", turnIndicator.innerHTML = "Player 2 turn";
+		gameArena.strokeStyle = window.greenColor, turnIndicator.style.color = window.greenColor, turnIndicator.innerHTML = "Player 2 turn";
 
 	for(var counter = 1; counter < 6; counter++)
 	{
@@ -149,17 +153,17 @@ function gameLoop(event)
 	if(!isGameOver)
 	{
 		takeBackUp();
-		if(turnCount%2 == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
+		if(turnCount%2 == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == window.redColor))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "red";
+			colorMatrix[column][row] = window.redColor;
 			turnCount++;
 			flag = false;
 		}
-		if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
+		if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == window.greenColor))
 		{
 			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "green";
+			colorMatrix[column][row] = window.greenColor;
 			turnCount++;
 			flag = false;
 		}
@@ -293,8 +297,8 @@ function gameOver()
 	{
 		for(var j = 0;j < 6; j++)
 		{
-			if(colorMatrix[i][j] == "red") countRed++;
-			if(colorMatrix[i][j] == "green") countGreen++;
+			if(colorMatrix[i][j] == window.redColor) countRed++;
+			if(colorMatrix[i][j] == window.greenColor) countGreen++;
 		}
 	}
 	if(turnCount > 1)
@@ -438,4 +442,60 @@ function threeCircle(row, column, color)
 	gameArena.stroke();
 	gameArena.closePath();
 	gameArena.lineWidth = 1;
+}
+
+function standardMode()
+{
+	if (turnCount) 
+	{
+		alert("Sorry, but you cannot change the theme in the middle of a game")
+	} else {
+		document.getElementById("body").style.backgroundColor = "black";
+		document.getElementById("arena").style.backgroundColor = "white";
+		document.getElementById("turnIndicator").style.color = "red";
+		window.redColor = "red";
+		window.greenColor = "green";
+	}
+}
+
+function pastelMode()
+{
+	if (turnCount) 
+	{
+		alert("Sorry, but you cannot change the theme in the middle of a game")
+	} else {
+		document.getElementById("body").style.backgroundColor = "thistle";
+		document.getElementById("arena").style.backgroundColor = "papayawhip";
+		document.getElementById("turnIndicator").style.color = "palevioletred";
+		window.redColor = "palevioletred";
+		window.greenColor = "powderblue";
+	}
+}
+
+function partyMode()
+{
+	if (turnCount) 
+	{
+		alert("Sorry, but you cannot change the theme in the middle of a game")
+	} else {
+		document.getElementById("body").style.backgroundColor = "plum";
+		document.getElementById("arena").style.backgroundColor = "mintcream";
+		document.getElementById("turnIndicator").style.color = "hotpink";
+		window.redColor = "hotpink";
+		window.greenColor = "lightseagreen";
+	}
+}
+
+function autumnMode()
+{
+	if (turnCount) 
+	{
+		alert("Sorry, but you cannot change the theme in the middle of a game")
+	} else {
+		document.getElementById("body").style.backgroundColor = "darkred";
+		document.getElementById("arena").style.backgroundColor = "tan";
+		document.getElementById("turnIndicator").style.color = "maroon";
+		window.redColor = "maroon";
+		window.greenColor = "orange";
+	}
 }

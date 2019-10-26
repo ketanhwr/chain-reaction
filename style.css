@@ -1,3 +1,7 @@
+:root {
+    --background: black;
+}
+
 html, body {
 	margin: 0;
 	padding: 0;
@@ -5,7 +9,7 @@ html, body {
 
 body
 {
-	background-color: black;
+	background-color: var(--background);
 	width: 100%;
 	margin: 0 auto;
 }
@@ -73,4 +77,16 @@ canvas
     -webkit-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
     -moz-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
     box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+}
+
+.whiteButton {
+	background-color: white; 
+ 	border: none;
+  	color: black;
+	padding: 15px 32px;
+	margin: 5px;
+  	text-align: center;
+  	text-decoration: none;
+  	display: inline-block;
+  	font-size: 16px;
 }
