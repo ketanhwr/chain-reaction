@@ -13,13 +13,32 @@ var isGameOver = false;
 var counterAnimate = 0;
 var flag = false;
 
+var playerCount = 2;
+var playerColors = ["red", "green", "blue", "orange", "hotpink", "purple", "yellow", "darkgray"];
+var playingPlayers = [1,1,1,1,1,1,1,1];
+var activePlayer = 0;
+
+
 var canvas = document.getElementById("arena");
 var button = document.getElementById("undo");
 var sound = document.getElementById("sound");
 var gameArena = canvas.getContext("2d");
 var turnIndicator = document.getElementById("turnIndicator");
+var playerRange = document.getElementById("playerSelector");
+var playerLabel = document.getElementById("playerLabel");
 canvas.addEventListener("click", gameLoop);
 button.addEventListener("click", undoGame);
+playerRange.addEventListener("click", function () {
+	if (turnCount == 0){
+		playerCount = playerRange.value;
+		playerLabel.innerHTML = playerRange.value+ " players";
+	}
+	else {
+		playerRange.value = playerCount;
+		playerLabel.innerHTML = playerRange.value+ " players";
+	}
+});
+
 
 initialiseMatrix();
 initialise();
@@ -33,6 +52,10 @@ function initialise()
 	drawArena();
 	turnCount = 0;
 	counterAnimate = 0;
+
+	playingPlayers = [1,1,1,1,1,1,1,1];
+	activePlayer = 0;
+
 	gameTimer = setInterval(updateMatrix, gameSpeed);
 }
 
@@ -64,11 +87,9 @@ function matrixDefault()
 function drawArena()
 {
 	gameArena.clearRect(0, 0, width, height);
-	
-	if(turnCount % 2 == 0)
-		gameArena.strokeStyle = "red", turnIndicator.style.color = "red", turnIndicator.innerHTML = "Player 1 turn";
-	else
-		gameArena.strokeStyle = "green", turnIndicator.style.color = "green", turnIndicator.innerHTML = "Player 2 turn";
+
+	gameArena.strokeStyle = playerColors[activePlayer], turnIndicator.style.color = playerColors[activePlayer], turnIndicator.innerHTML = "Player "+(activePlayer+1)+" turn";
+
 
 	for(var counter = 1; counter < 6; counter++)
 	{
@@ -118,7 +139,9 @@ function undoGame()
 				colorMatrix[i][j] = undoColor[i][j];
 			}
 		}
-		
+		if (activePlayer == 0) activePlayer = playerCount -1;
+		else activePlayer--;
+
 	} else {
 		 $('.undoMessage').stop().fadeIn(400).delay(2000).fadeOut(400); //fade out after 2 seconds
 	}
@@ -149,19 +172,37 @@ function gameLoop(event)
 	if(!isGameOver)
 	{
 		takeBackUp();
-		if(turnCount%2 == 0 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "red"))
+		for (var i = 0; i < playerCount; i++)
 		{
-			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "red";
-			turnCount++;
-			flag = false;
-		}
-		if(turnCount%2 == 1 && (colorMatrix[column][row] == "" || colorMatrix[column][row] == "green"))
-		{
-			countMatrix[column][row]++;		//Weird graphic coordinate-system
-			colorMatrix[column][row] = "green";
-			turnCount++;
-			flag = false;
+			if (activePlayer == i && colorMatrix[column][row] == "" || colorMatrix[column][row] == playerColors[activePlayer])
+			{
+				countMatrix[column][row]++;
+				colorMatrix[column][row] = playerColors[activePlayer];
+				turnCount++;
+				flag = false;
+
+				var nextPlayer = activePlayer + 1;
+				if (nextPlayer >= playerCount){
+					nextPlayer = 0;
+				}
+
+				for (var j = 0; j < playerCount; j++){
+
+					if (playingPlayers[nextPlayer] == 0) {
+						if (nextPlayer == 3){
+							nextPlayer = 0;
+						}
+						else {
+							nextPlayer++;
+						}
+
+					}
+					else {
+						activePlayer = nextPlayer;
+						break;
+					}
+				}
+			}
 		}
 	}
 }
@@ -287,48 +328,93 @@ function notStable()
 
 function gameOver()
 {
+	var playerColors = ["red", "green", "blue", "orange", "hotpink", "purple", "yellow", "darkgray"];
 	var countRed = 0;
 	var countGreen = 0;
+	var countBlue = 0;
+	var countOrange = 0;
+	var countHotpink = 0;
+	var countPurple = 0;
+	var countYellow = 0;
+	var countDarkgray = 0;
+
 	for(var i = 0; i < 9; i++)
 	{
 		for(var j = 0;j < 6; j++)
 		{
 			if(colorMatrix[i][j] == "red") countRed++;
 			if(colorMatrix[i][j] == "green") countGreen++;
+			if(colorMatrix[i][j] == "blue") countBlue++;
+			if(colorMatrix[i][j] == "orange") countOrange++;
+			if(colorMatrix[i][j] == "hotpink") countHotpink++;
+			if(colorMatrix[i][j] == "purple") countPurple++;
+			if(colorMatrix[i][j] == "yellow") countYellow++;
+			if(colorMatrix[i][j] == "darkgray") countDarkgray++;
 		}
 	}
-	if(turnCount > 1)
+
+	var playersAlive = playerCount;
+	if(turnCount > playerCount)
 	{
-		if(countRed == 0)
+		if(countRed == 0 && playerCount >= 1)
 		{
-			return 2;
+			playingPlayers[0] = 0;
+			playersAlive--;
 		}
-		if(countGreen == 0)
+		if(countGreen == 0 && playerCount >= 2)
 		{
+			playingPlayers[1] = 0;
+			playersAlive--;
+		}
+		if(countBlue == 0 && playerCount >= 3)
+		{
+			playingPlayers[2] = 0;
+			playersAlive--;
+		}
+		if(countOrange == 0 && playerCount >= 4)
+		{
+			playingPlayers[3] = 0;
+			playersAlive--;
+		}
+		if(countHotpink == 0 && playerCount >= 5)
+		{
+			playingPlayers[4] = 0;
+			playersAlive--;
+		}
+		if(countPurple == 0 && playerCount >= 6)
+		{
+			playingPlayers[5] = 0;
+			playersAlive--;
+		}
+		if(countYellow == 0 && playerCount >= 7)
+		{
+			playingPlayers[6] = 0;
+			playersAlive--;
+		}
+		if(countDarkgray == 0 && playerCount >= 8)
+		{
+			playingPlayers[7] = 0;
+			playersAlive--;
+		}
+		if (playersAlive <= 1){
 			return 1;
 		}
+		else return 0;
 	}
 }
 
 function gameOverScreen(player)
 {
-	if(player == 2)
-	{
-		gameArena.clearRect(0, 0, width, height);
-		gameArena.fillStyle = "black";
-		gameArena.fillRect(0, 0, width, height);
-		gameArena.fillStyle = "white";
-		gameArena.font = "40px Times New Roman";
-		gameArena.fillText("Player 2 wins!", width/2 - 150, height/2 - 50);
-	}
-	else
-	{
-		gameArena.clearRect(0, 0, width, height);
-		gameArena.fillStyle = "black";
-		gameArena.fillRect(0, 0, width, height);
-		gameArena.fillStyle = "white";
-		gameArena.font = "40px Times New Roman";
-		gameArena.fillText("Player 1 wins!", width/2 - 150, height/2 - 50);
+	for (var i = 0; i < playerCount; i++){
+		if (playingPlayers[i] == 1){
+			gameArena.clearRect(0, 0, width, height);
+			gameArena.fillStyle = "black";
+			gameArena.fillRect(0, 0, width, height);
+			gameArena.fillStyle = "white";
+			gameArena.font = "40px Times New Roman";
+			gameArena.fillText("Player "+ (i + 1) +" wins!", width/2 - 150, height/2 - 50);
+			break;
+		}
 	}
 }
 

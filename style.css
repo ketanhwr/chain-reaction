@@ -30,6 +30,10 @@ canvas
 	margin: 0 auto;
 }
 
+#playerLabel{
+	color: #ffffff;
+}
+
 .undo
 {
 	margin: 0 auto;
