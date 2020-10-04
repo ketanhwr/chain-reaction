@@ -1,3 +1,7 @@
+import $ from 'jquery';
+import '../scss/style.scss';
+import '../assets/point_sound.mp3';
+
 var width = 420;
 var height = 630;
 var gapWidth = width/6;
