@@ -1,7 +1,7 @@
 {
   "name": "chain-reaction-plus",
   "version": "1.0.0",
-  "description": "This is a advanced version of popular chain reaction game",
+  "description": "This is a online version of popular chain reaction game",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chaitanyax/chain-reaction.git"
+    "url": "git+https://github.com/ketanhwr/chain-reaction.git"
   },
   "author": "chaitanyax",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chaitanyax/chain-reaction/issues"
+    "url": "https://github.com/ketanhwr/chain-reaction.git"
   },
-  "homepage": "https://github.com/chaitanyax/chain-reaction#readme",
+  "homepage": "https://github.com/ketanhwr/chain-reaction.git#readme",
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
